@@ -32,6 +32,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
+  config.vm.network "forwarded_port", guest: 5432, host: 5432, host_ip: "127.0.0.1"
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -74,7 +75,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       :postgresql => {
         :password => {
           :postgres => 'test'
-        }
+        },
+        :config => {
+          :listen_addresses => '0.0.0.0'
+        },
+        :pg_hba => [
+          {:type => 'local', :db => 'all', :user => 'postgres', :addr => nil, :method => 'ident'},
+          {:type => 'local', :db => 'all', :user => 'all', :addr => nil, :method => 'ident'},
+          {:type => 'host', :db => 'all', :user => 'all', :addr => '127.0.0.1/32', :method => 'md5'},
+          {:type => 'host', :db => 'all', :user => 'all', :addr => '::1/128', :method => 'md5'},
+          {:type => 'host', :db => 'regularroutes', :user => 'regularroutes', :addr => '0.0.0.0/0', :method => 'md5'}
+        ]
       }
     }
     chef.run_list = [
