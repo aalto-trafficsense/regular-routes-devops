@@ -10,7 +10,7 @@ One-time setup for the development machine
 
 3. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 
-4. Install Vagrant Bershelf plugin
+4. Install Vagrant Berkshelf plugin
 
         vagrant plugin install vagrant-berkshelf
 
