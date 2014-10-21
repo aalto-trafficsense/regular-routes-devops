@@ -21,6 +21,29 @@ Run Vagrant in the devops repository directory (where Vagrantfile is)
 
     vagrant up
 
+Importing Open Street map data from crossings-repository
+--------------------------------------------------------
+
+
+* Remarks 1: Waypoint (crossings) data is in Open Street Map (osm) formatting
+* Remarks 2: This instructions expects you to have vagrant up and running with PostgreSQL (+PostGIS) database service up & running and port forwarding to db service to port 5432 at localhost 
+
+1. Download and **install osm2pgsql** (http://wiki.openstreetmap.org/wiki/Osm2pgsql#Installation)
+2. clone crossings repo or just **download the target osm file**
+3. **Execute** the following **command** in shell:
+```
+    osm2pgsql -s -H localhost -P 5432 -U regularroutes -d regularroutes -W <path_to_osm_file>
+```
+**Wait for osm2pgsql to finish it's job and you are done** 
+
+* The parameters for osm2pgsql are:
+** -s (slim Mode, recommended)
+** -H (host for db)
+** -P (db service port)
+** -U (db user)
+** -d (db name)
+** -W (force asking password), in this setup username/password are the same
+
 
 Problem(s) and Solutions
 ---------------------------
