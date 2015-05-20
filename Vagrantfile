@@ -71,6 +71,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # config.berkshelf.except = []
 
   config.vm.provision :chef_zero do |chef|
+    chef.json = {
+      'regularroutes' => {
+        'db_password' => 'topsecret'
+      }
+    }
     chef.run_list = [
       "recipe[regularroutes::default]"
     ]
