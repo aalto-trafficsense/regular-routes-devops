@@ -1,23 +1,18 @@
-include_recipe 'build-essential::default'
-
-package('ruby-dev') { action :nothing }.run_action(:install)
+include_recipe 'postgresql::postgis'
+include_recipe 'postgresql::server'
 
 package 'language-pack-fi'
 
-include_recipe 'database::postgresql'
-include_recipe 'postgresql::server'
-include_recipe 'postgis::default'
-
-postgresql_connection_info = {:host => 'localhost'}
-
-postgresql_database_user 'regularroutes' do
-  connection postgresql_connection_info
+postgresql_user 'regularroutes' do
+  login true
   password 'regularroutes'
 end
 
 postgresql_database 'regularroutes' do
-  connection postgresql_connection_info
-  template node['postgis']['template_name']
   owner 'regularroutes'
-  action :create
+  encoding 'UTF-8'
+end
+
+postgresql_extension 'postgis' do
+  database 'regularroutes'
 end

@@ -11,7 +11,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at vagrantup.com.
 
-  config.vm.hostname = "regularroutes-berkshelf"
+  config.vm.hostname = "regularroutes"
 
   # Every Vagrant virtual environment requires a box to build off of.
   # If this value is a shorthand to a box in Vagrant Cloud then 
@@ -27,12 +27,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # via the IP. Host-only networks can talk to the host machine as well as
   # any other machines on the same network, but cannot be accessed (through this
   # network interface) by any external networks.
-  config.vm.network :private_network, type: "dhcp"
+  # config.vm.network :private_network, type: "dhcp"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
-  config.vm.network "forwarded_port", guest: 5432, host: 5432, host_ip: "127.0.0.1"
+  # config.vm.network "forwarded_port", guest: 5432, host: 5432, host_ip: "127.0.0.1"
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -70,24 +70,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # to skip installing and copying to Vagrant's shelf.
   # config.berkshelf.except = []
 
-  config.vm.provision :chef_solo do |chef|
-    chef.json = {
-      :postgresql => {
-        :password => {
-          :postgres => 'test'
-        },
-        :config => {
-          :listen_addresses => '0.0.0.0'
-        },
-        :pg_hba => [
-          {:type => 'local', :db => 'all', :user => 'postgres', :addr => nil, :method => 'ident'},
-          {:type => 'local', :db => 'all', :user => 'all', :addr => nil, :method => 'ident'},
-          {:type => 'host', :db => 'all', :user => 'all', :addr => '127.0.0.1/32', :method => 'md5'},
-          {:type => 'host', :db => 'all', :user => 'all', :addr => '::1/128', :method => 'md5'},
-          {:type => 'host', :db => 'regularroutes', :user => 'regularroutes', :addr => '0.0.0.0/0', :method => 'md5'}
-        ]
-      }
-    }
+  config.vm.provision :chef_zero do |chef|
     chef.run_list = [
       "recipe[regularroutes::default]"
     ]
