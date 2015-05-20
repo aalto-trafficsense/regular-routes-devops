@@ -73,11 +73,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision :chef_zero do |chef|
     chef.json = {
       'regularroutes' => {
-        'db_password' => 'topsecret'
+        'db_password' => 'topsecret',
+        'osm_url' => 'http://download.geofabrik.de/europe/faroe-islands-latest.osm.pbf'
       }
     }
     chef.run_list = [
-      "recipe[regularroutes::default]"
+      "recipe[regularroutes::osm]"
     ]
   end
 end

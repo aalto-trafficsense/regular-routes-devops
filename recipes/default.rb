@@ -1,10 +1,3 @@
-include_recipe "nginx"
-include_recipe 'postgresql::libpq'
-include_recipe 'postgresql::postgis'
-include_recipe 'postgresql::server'
-include_recipe 'python::pip'
-include_recipe 'python::virtualenv'
-
 cookbook_file "/etc/init/regularroutes.conf" do
   source "upstart.conf"
   mode "0644"
@@ -14,36 +7,13 @@ service "regularroutes" do
   action :stop
 end
 
-package 'git'
-package 'language-pack-fi'
+include_recipe 'regularroutes::_base'
+include_recipe 'nginx'
+include_recipe 'python::pip'
+include_recipe 'python::virtualenv'
+
 package 'libffi-dev'
 package 'python-dev'
-
-postgresql_user 'regularroutes' do
-  login true
-  password node[:regularroutes][:db_password]
-end
-
-postgresql_database 'regularroutes' do
-  owner 'regularroutes'
-  encoding 'UTF-8'
-end
-
-postgresql_extension 'postgis' do
-  database 'regularroutes'
-end
-
-user 'regularroutes' do
-  system true
-  shell '/bin/false'
-end
-
-directory '/opt/regularroutes' do
-  owner 'root'
-  group 'root'
-  mode '0755'
-  action :create
-end
 
 template '/opt/regularroutes/regularroutes.cfg' do
   source 'regularroutes.cfg.erb'
