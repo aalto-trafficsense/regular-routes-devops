@@ -30,4 +30,3 @@ directory '/opt/regularroutes' do
   mode '0755'
   action :create
 end
-

@@ -1,5 +1,6 @@
 name 'regularroutes'
 
+depends 'apt', '~> 2.7.0'
 depends 'build-essential', '~> 2.2.3'
 depends 'nginx', '~> 2.7.6'
 depends 'postgresql'

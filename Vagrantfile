@@ -74,11 +74,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.json = {
       'regularroutes' => {
         'db_password' => 'topsecret',
-        'osm_url' => 'http://download.geofabrik.de/europe/faroe-islands-latest.osm.pbf'
+        'osm_url' => 'http://download.geofabrik.de/europe/faroe-islands-latest.osm.pbf',
+        # The vagrant base box has only 512 MB of memory, so we have to tune the cache size here (default is dense cache, 800 MB)
+        'osm2pgsql_args' => '--cache-strategy sparse --cache 128'
       }
     }
     chef.run_list = [
-      "recipe[regularroutes::osm]"
+      "recipe[regularroutes::default]"
     ]
   end
 end
