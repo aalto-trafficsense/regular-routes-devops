@@ -19,7 +19,7 @@ template '/opt/regularroutes/regularroutes.cfg' do
   source 'regularroutes.cfg.erb'
   mode '0750'
   owner 'root'
-  group 'regularroutes'
+  group node['regularroutes']['user']
 end
 
 git '/opt/regularroutes/server' do
