@@ -19,7 +19,7 @@ postgresql_extension 'postgis' do
   database 'regularroutes'
 end
 
-user node['regularroutes']['user'] do
+user 'regularroutes' do
   system true
   shell '/bin/false'
 end

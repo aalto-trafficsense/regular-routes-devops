@@ -2,16 +2,16 @@ include_recipe 'regularroutes::_base'
 include_recipe 'build-essential::default'
 
 directory '/opt/regularroutes/osm' do
-  user node['regularroutes']['user']
-  group node['regularroutes']['user']
+  owner 'regularroutes'
+  group 'regularroutes'
   mode '0755'
   action :create
 end
 
 remote_file '/opt/regularroutes/osm/regularroutes.osm.pbf' do
   source node[:regularroutes][:osm_url]
-  user node['regularroutes']['user']
-  group node['regularroutes']['user']
+  user 'regularroutes'
+  group 'regularroutes'
   mode '0644'
 end
 
