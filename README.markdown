@@ -1,7 +1,7 @@
 regular-routes DevOps repository
 ================================
 
-Setting up local development environment and building cookbook package
+Setting up local development environment
 ------------------------------------------
 
 1. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):  
@@ -9,12 +9,27 @@ Setting up local development environment and building cookbook package
         `sudo dpkg -i chefdk_0.6.0-1_amd64.deb`  
 1. Clone regular-routes-devops repo:  
         `git clone https://github.com/aalto-trafficsense/regular-routes-devops.git`
-1. `cd regular-routes-devops`  
-1. Package Cookbooks (including dependencies)  
-        `berks package`  
-        --> creates a file named like `cookbooks-1432555542.tar.gz`  
+  
+A Setting up development server at Digital Ocean
+----------------------------------------
 
-Setting up local development server
+1. IN LOCAL DESKTOP: package cookbooks (resolving and including dependencies)
+        `cd regular-routes-devops`  
+        `berks package`  
+        --> creates a file named like `cookbooks-1432555542.tar.gz`
+1. Setup a new virtual server at [Digital Ocean](https://www.digitalocean.com)
+1. Login to server using SSH client
+1. [Install Chef client](https://www.chef.io/download-chef-client/):  
+        `curl -L https://www.chef.io/chef/install.sh | sudo bash`  
+1. IN LOCAL DESKTOP: copy cookbook package from local workstation to newly created server at digital ocean
+        `scp cookbooks-1432555542.tar.gz user@host ...`
+1. Unzip cookbook package  
+        `tar xfz cookbooks-1432555542.tar.gz`  
+1. Run Chef recipe in local mode  
+        `sudo chef-client --local-mode --runlist 'recipe[regularroutes]`  
+        Note! this may fail due to some packages not to be up-to-date and you need to run `apt-get update` and re-run chef-client command  
+
+B Setting up local development server
 ------------------------------------------
 
 1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
@@ -26,19 +41,6 @@ Setting up local development server
 
 *Note! No need to run Chef manually since Vagrantfile specifies the Chef Cookbook used to setup server*
 
-Setting up development server at Digital Ocean
-----------------------------------------
-
-1. Setup a new virtual server at [Digital Ocean](https://www.digitalocean.com)
-1. Login to server using SSH client
-1. [Install Chef client](https://www.chef.io/download-chef-client/):  
-        `curl -L https://www.chef.io/chef/install.sh | sudo bash`  
-1. Copy cookbook package from local workstation to server 
-1. Unzip cookbook package  
-        `tar xfz cookbooks-1432555542.tar.gz`  
-1. Run Chef recipe in local mode  
-        `sudo chef-client --local-mode --runlist 'recipe[regularroutes]`  
-        Note! this may fail due to some packages not to be up-to-date and you need to run `apt-get update` and re-run chef-client command  
 
 Importing Open Street map data from crossings-repository
 --------------------------------------------------------
