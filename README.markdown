@@ -16,7 +16,8 @@ Setting up a local development server
 Setting up a remote development server at Digital Ocean
 ----------------------------------------
 
-1. Setup a new virtual server at [Digital Ocean](https://www.digitalocean.com) 
+1. Setup a new virtual server at [Digital Ocean](https://www.digitalocean.com)
+2. Login to server using SSH client
 2. Install git:  
     `apt-get install git`
 3. Clone regular-routes-devops repo:  
