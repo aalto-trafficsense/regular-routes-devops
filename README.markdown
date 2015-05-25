@@ -13,7 +13,7 @@ Preparing local development environment
 A: Setting up development server at Digital Ocean
 ----------------------------------------
 
-1. IN LOCAL DESKTOP: package cookbooks (resolving and including dependencies)
+1. IN LOCAL DESKTOP: package cookbooks (resolving and including dependencies)  
         `cd regular-routes-devops`  
         `berks package`  
         --> creates a file named like `cookbooks-1432555542.tar.gz`
@@ -21,7 +21,7 @@ A: Setting up development server at Digital Ocean
 1. Login to server using SSH client
 1. [Install Chef client](https://www.chef.io/download-chef-client/):  
         `curl -L https://www.chef.io/chef/install.sh | sudo bash`  
-1. IN LOCAL DESKTOP: copy cookbook package from local workstation to newly created server at digital ocean
+1. IN LOCAL DESKTOP: copy cookbook package from local workstation to newly created server at digital ocean  
         `scp cookbooks-1432555542.tar.gz user@host ...`
 1. Unzip cookbook package  
         `tar xfz cookbooks-1432555542.tar.gz`  
