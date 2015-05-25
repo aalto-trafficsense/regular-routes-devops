@@ -1,7 +1,8 @@
 regular-routes DevOps repository
 ================================
 
-One-time setup for the development machine
+
+Setting up a local development server
 ------------------------------------------
 
 1. Install [Vagrant](https://www.vagrantup.com/downloads.html)
@@ -12,14 +13,19 @@ One-time setup for the development machine
 
 4. Install Vagrant Berkshelf plugin
 
-        vagrant plugin install vagrant-berkshelf
+    vagrant plugin install vagrant-berkshelf
 
-Setting up a development virtual machine
-----------------------------------------
-
-Run Vagrant in the devops repository directory (where Vagrantfile is)
+5. Run Vagrant in the devops repository directory (where Vagrantfile is)
 
     vagrant up
+    
+Setting up a remote development server at Digital Ocean
+----------------------------------------
+
+1. Setup a new virtual server at [Digital Ocean](https://www.digitalocean.com) 
+
+2. Install git: 'apt-get install git'
+
 
 Importing Open Street map data from crossings-repository
 --------------------------------------------------------
