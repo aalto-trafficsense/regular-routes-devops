@@ -23,11 +23,11 @@ Setting up a remote development server at Digital Ocean
 ----------------------------------------
 
 1. Setup a new virtual server at [Digital Ocean](https://www.digitalocean.com) 
-2. Install git: 
+2. Install git:  
     `apt-get install git`
-3. Clone regular-routes-devops repo:
+3. Clone regular-routes-devops repo: 
     `git clone https://github.com/aalto-trafficsense/regular-routes-devops.git`
-4. [Install Chef client](https://www.chef.io/download-chef-client/):
+4. [Install Chef client](https://www.chef.io/download-chef-client/): 
     `curl -L https://www.chef.io/chef/install.sh | sudo bash`
 
 
