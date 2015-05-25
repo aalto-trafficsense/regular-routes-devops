@@ -13,6 +13,8 @@ Setting up a local development server
 5. Run Vagrant in the devops repository directory (where Vagrantfile is)  
     `vagrant up`
 
+*Note! No need to run Chef manually since Vagrantfile specifies the Chef Cookbook used to setup server*
+
 Setting up a remote development server at Digital Ocean
 ----------------------------------------
 
