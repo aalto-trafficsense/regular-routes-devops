@@ -1,16 +1,21 @@
 regular-routes DevOps repository
 ================================
 
+Setting up development environment
+------------------------------------------
+
+1. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):
+    `curl -L -O https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.6.0-1_amd64.deb`
+    `sudo dpkg -i chefdk_0.6.0-1_amd64.deb`
 
 Setting up a local development server
 ------------------------------------------
 
+1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 1. Install [Vagrant](https://www.vagrantup.com/downloads.html)
-2. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/)
-3. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-4. Install Vagrant Berkshelf plugin  
+1. Install Vagrant Berkshelf plugin  
     `vagrant plugin install vagrant-berkshelf`
-5. Run Vagrant in the devops repository directory (where Vagrantfile is)  
+1. Run Vagrant in the devops repository directory (where Vagrantfile is)  
     `vagrant up`
 
 *Note! No need to run Chef manually since Vagrantfile specifies the Chef Cookbook used to setup server*
@@ -19,13 +24,15 @@ Setting up a remote development server at Digital Ocean
 ----------------------------------------
 
 1. Setup a new virtual server at [Digital Ocean](https://www.digitalocean.com)
-2. Login to server using SSH client
-2. Install git:  
+1. Login to server using SSH client
+1. Install git:  
     `apt-get install git`
 3. Clone regular-routes-devops repo:  
     `git clone https://github.com/aalto-trafficsense/regular-routes-devops.git`
-4. [Install Chef client](https://www.chef.io/download-chef-client/):  
-    `curl -L https://www.chef.io/chef/install.sh | sudo bash`
+4. [Install Chef Development Kit](https://downloads.getchef.com/chef-dk/):  
+5. Package Cookbooks (including dependencies
+    `berks package`
+6. Unpack cookbooks
 
 
 
