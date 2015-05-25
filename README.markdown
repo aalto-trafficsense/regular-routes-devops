@@ -29,7 +29,7 @@ A Setting up development server at Digital Ocean
         `sudo chef-client --local-mode --runlist 'recipe[regularroutes]`  
         Note! this may fail due to some packages not to be up-to-date and you need to run `apt-get update` and re-run chef-client command  
 
-B Setting up local development server
+B Setting up local development server using Virtualbox and Vagrant
 ------------------------------------------
 
 1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
