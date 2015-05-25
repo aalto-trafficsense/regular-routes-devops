@@ -31,8 +31,6 @@ Setting up development server at Digital Ocean
 
 1. Setup a new virtual server at [Digital Ocean](https://www.digitalocean.com)
 1. Login to server using SSH client
-1. Install git:  
-        `apt-get install git`  
 1. [Install Chef client](https://www.chef.io/download-chef-client/):  
         `curl -L https://www.chef.io/chef/install.sh | sudo bash`  
 1. Copy cookbook package from local workstation to server 
