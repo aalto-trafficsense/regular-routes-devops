@@ -27,7 +27,7 @@ A: Setting up development server at Digital Ocean
         `tar xfz cookbooks-1432555542.tar.gz`  
 1. Run Chef recipe in local mode  
         `sudo chef-client --local-mode --runlist 'recipe[regularroutes]`  
-        Note! this may fail due to some packages not to be up-to-date and you need to run `apt-get update` and re-run chef-client command  
+        Note! this may fail due to some packages not being up-to-date and you need to run `apt-get update` and then re-run chef-client command  
 
 B: Setting up local development server using Virtualbox and Vagrant
 ------------------------------------------
