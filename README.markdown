@@ -1,7 +1,7 @@
 regular-routes DevOps repository
 ================================
 
-Setting up local development environment
+Preparing local development environment
 ------------------------------------------
 
 1. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):  
