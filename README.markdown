@@ -8,8 +8,8 @@ Setting up local development environment and building cookbook package
     `curl -L -O https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.6.0-1_amd64.deb`  
     `sudo dpkg -i chefdk_0.6.0-1_amd64.deb`  
 1. Clone regular-routes-devops repo:  
-    `git clone https://github.com/aalto-trafficsense/regular-routes-devops.git`  
-    `cd regular-routes-devops`  
+    `git clone https://github.com/aalto-trafficsense/regular-routes-devops.git`
+1. `cd regular-routes-devops`  
 1. Package Cookbooks (including dependencies)  
     `berks package`  
     --> creates a file named like `cookbooks-1432555542.tar.gz`  
