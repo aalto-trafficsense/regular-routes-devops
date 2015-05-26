@@ -56,13 +56,13 @@ nginx_site "regularroutes.conf"
 cron 'curl_duplicates' do
   hour '1'
   minute '0'
-  command 'curl http://localhost/api/maintenance/duplicates'
+  command 'curl -s http://localhost/api/maintenance/duplicates'
 end
 
 cron 'curl_snapping' do
   hour '2'
   minute '0'
-  command 'curl http://localhost/api/maintenance/snapping'
+  command 'curl -s http://localhost/api/maintenance/snapping'
 end
 
 service "regularroutes" do
