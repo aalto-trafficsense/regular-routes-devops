@@ -57,12 +57,14 @@ cron 'curl_duplicates' do
   hour '1'
   minute '0'
   command 'curl -s http://localhost/api/maintenance/duplicates'
+  user 'lerero'
 end
 
 cron 'curl_snapping' do
   hour '2'
   minute '0'
   command 'curl -s http://localhost/api/maintenance/snapping'
+  user 'lerero'
 end
 
 service "regularroutes" do
