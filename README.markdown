@@ -13,7 +13,7 @@ Preparing local development environment
 A: Setting up development server at Digital Ocean
 ----------------------------------------
 
-1. IN LOCAL DESKTOP: package cookbooks (resolving and including dependencies)  
+1. IN LOCAL DESKTOP: package cookbooks (automatically resolves and includes dependencies)  
         `cd regular-routes-devops`  
         `berks package`  
         --> creates a file named like `cookbooks-1432555542.tar.gz`
@@ -39,7 +39,7 @@ B: Setting up local development server using Virtualbox and Vagrant
 1. Run Vagrant in the devops repository directory (where Vagrantfile is)  
         `vagrant up`  
 
-*Note! No need to run Chef manually since Vagrantfile specifies the Chef Cookbook used to setup server*
+*Note! No need to run Berks or Chef manually since Vagrantfile specifies the Chef Cookbook used to setup server*
 
 
 Importing Open Street map data from crossings-repository
