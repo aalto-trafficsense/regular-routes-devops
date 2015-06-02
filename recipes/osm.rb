@@ -38,7 +38,7 @@ git '/opt/regularroutes/osm/crossings' do
   action :sync
 end
 
-execute 'psql -v ON_ERROR_STOP=1 -f /opt/regularroutes/osm/crossings/sql/queries.sql' do
+execute 'psql -d regularroutes -v ON_ERROR_STOP=1 -f /opt/regularroutes/osm/crossings/sql/queries.sql' do
   cwd '/opt/regularroutes/osm/crossings/sql'
   environment(
     'PGHOST' => 'localhost',
