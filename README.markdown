@@ -1,22 +1,42 @@
 regular-routes DevOps repository
 ================================
 
-Preparing local development environment
+A: Preparing local development environment
 ------------------------------------------
 
 1. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):  
         `curl -L -O https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.6.0-1_amd64.deb`  
         `sudo dpkg -i chefdk_0.6.0-1_amd64.deb`  
+1. Install git if not present
+        `apt-get install git`
 1. Clone regular-routes-devops repo:  
         `git clone https://github.com/aalto-trafficsense/regular-routes-devops.git`
+
+_Note: The local development environment is not recommended for the server._
   
-A: Setting up development server at Digital Ocean
+B: Create the local JSON file
+-----------------------------
+    {
+      "override": {
+        "regularroutes": {
+          "maps_api_key" : "<create in Google console>",
+          "db_password": "<create for the database>"
+        }
+      },
+      "run_list": ["recipe[regularroutes]"]
+    }
+
+
+C: Setting up development server at Digital Ocean
 ----------------------------------------
 
 1. IN LOCAL DESKTOP: package cookbooks (automatically resolves and includes dependencies)  
         `cd regular-routes-devops`  
         `berks package`  
         --> creates a file named like `cookbooks-1432555542.tar.gz`
+
+        _Alternative: `berks vendor <path>`creates the files directly to <path>. One good path is `..` But BEWARE, this may cleanup your whole directory structure._
+
 1. Setup a new virtual server at [Digital Ocean](https://www.digitalocean.com)
 1. Login to server using SSH client
 1. [Install Chef client](https://www.chef.io/download-chef-client/):  
@@ -25,11 +45,22 @@ A: Setting up development server at Digital Ocean
         `scp cookbooks-1432555542.tar.gz user@host ...`
 1. Unzip cookbook package  
         `tar xfz cookbooks-1432555542.tar.gz`  
+1. Populate the OSM database  
+        `sudo chef-client --local-mode --runlist 'recipe[regularroutes::osm] -j ../regularroutes.json`  
+        _Note1: this may fail due to some packages not being up-to-date and you need to run `apt-get update` and then re-run chef-client command.
+        _Note2: Currently memory-hungry. May fail if the server doesn't have enough memory._
 1. Run Chef recipe in local mode  
-        `sudo chef-client --local-mode --runlist 'recipe[regularroutes]`  
-        Note! this may fail due to some packages not being up-to-date and you need to run `apt-get update` and then re-run chef-client command  
+        `sudo chef-client --local-mode --runlist 'recipe[regularroutes] -j ../regularroutes.json`
+1. Copy client_secrets.json to `/opt/regularroutes`
+1. Rectify user rights
+    chgrp lerero client_secrets.json
+    chmod 0640 client_secrets.json
+1. Start the server
+    restart regularroutes
 
-B: Setting up local development server using Virtualbox and Vagrant
+Logs will be in `/var/log/upstart/`
+
+D: Setting up local development server using Virtualbox and Vagrant
 ------------------------------------------
 
 1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
@@ -42,7 +73,7 @@ B: Setting up local development server using Virtualbox and Vagrant
 *Note! No need to run Berks or Chef manually since Vagrantfile specifies the Chef Cookbook used to setup server*
 
 
-Importing Open Street map data from crossings-repository
+E: Importing Open Street map data from crossings-repository
 --------------------------------------------------------
 
 
@@ -66,7 +97,7 @@ Importing Open Street map data from crossings-repository
 ** -W (force asking password), in this setup username/password are the same
 
 
-Problem(s) and Solutions
+F: Problem(s) and Solutions
 ---------------------------
 **Problem:** 
 ```
@@ -80,3 +111,13 @@ VBoxManage dhcpserver remove --netname HostInterfaceNetworking-vboxnet0
 ```
 
 **Original issue:** https://github.com/mitchellh/vagrant/issues/3083
+
+**Problem:**
+The database is created for a wrong key (typically the JSON-file was not found when running chef).
+
+**Solution:**
+Either start server creation from scratch or apply the following commands:
+$ sudo -u postgres psql
+In postgres:
+> DROP DATABASE regularroutes ;
+> DROP USER regularroutes ;
