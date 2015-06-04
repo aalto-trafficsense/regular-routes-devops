@@ -43,12 +43,13 @@ A: Setting up development server at Digital Ocean
         `curl -L https://www.chef.io/chef/install.sh | sudo bash`  
 1. IN LOCAL DESKTOP: copy cookbook package from local workstation to newly created server at digital ocean  
         `scp cookbooks-1432555542.tar.gz user@host ...`
+1. Update packages by running `apt-get update`
 1. Unzip cookbook package  
         `tar xfz cookbooks-1432555542.tar.gz`  
+1. Copy regularroutes.json file (content and format describe above) from your local desktop to the server   
 1. Populate the OSM database  
         `sudo chef-client --local-mode --runlist 'recipe[regularroutes::osm] -j ../regularroutes.json`  
-        _Note1: this may fail due to some packages not being up-to-date and you need to run `apt-get update` and then re-run chef-client command.
-        _Note2: Currently memory-hungry. May fail if the server doesn't have enough memory._
+        _Note: Currently memory-hungry. May fail if the server doesn't have enough memory._
 1. Run Chef recipe in local mode  
         `sudo chef-client --local-mode --runlist 'recipe[regularroutes] -j ../regularroutes.json`
 1. Copy client_secrets.json to `/opt/regularroutes`
