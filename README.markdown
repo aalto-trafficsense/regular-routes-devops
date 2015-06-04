@@ -47,11 +47,11 @@ A: Setting up development server at Digital Ocean
 1. Unzip cookbook package  
         `tar xfz cookbooks-1432555542.tar.gz`  
 1. Copy regularroutes.json file (content and format describe above) from your local desktop to the server   
-1. Populate the OSM database  
-        `sudo chef-client --local-mode --runlist 'recipe[regularroutes::osm] -j ../regularroutes.json'`  
+1. Populate the OSM database (run osm recipe in local mode)
+        `sudo chef-client --local-mode --runlist 'recipe[regularroutes::osm]' -j ../regularroutes.json`  
         _Note: Currently memory-hungry. May fail if the server doesn't have enough memory._
-1. Run Chef recipe in local mode  
-        `sudo chef-client --local-mode --runlist 'recipe[regularroutes] -j ../regularroutes.json`
+1. Setup server (run default recipe in local mode)
+        `sudo chef-client --local-mode --runlist 'recipe[regularroutes]' -j ../regularroutes.json`
 1. Copy client_secrets.json to `/opt/regularroutes`
 1. Rectify user rights
     chgrp lerero client_secrets.json
