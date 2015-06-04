@@ -1,7 +1,7 @@
 regular-routes DevOps repository
 ================================
 
-A: Preparing local development environment
+Preparing local development environment
 ------------------------------------------
 
 1. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):  
@@ -14,7 +14,7 @@ A: Preparing local development environment
 
 _Note: The local development environment is not recommended for the server._
   
-B: Create the local JSON file
+Create the local JSON file
 -----------------------------
     {
       "override": {
@@ -27,7 +27,7 @@ B: Create the local JSON file
     }
 
 
-C: Setting up development server at Digital Ocean
+A: Setting up development server at Digital Ocean
 ----------------------------------------
 
 1. IN LOCAL DESKTOP: package cookbooks (automatically resolves and includes dependencies)  
@@ -60,7 +60,7 @@ C: Setting up development server at Digital Ocean
 
 Logs will be in `/var/log/upstart/`
 
-D: Setting up local development server using Virtualbox and Vagrant
+B: Setting up local development server using Virtualbox and Vagrant
 ------------------------------------------
 
 1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
@@ -73,7 +73,7 @@ D: Setting up local development server using Virtualbox and Vagrant
 *Note! No need to run Berks or Chef manually since Vagrantfile specifies the Chef Cookbook used to setup server*
 
 
-E: Importing Open Street map data from crossings-repository
+Importing Open Street map data from crossings-repository
 --------------------------------------------------------
 
 
@@ -97,7 +97,7 @@ E: Importing Open Street map data from crossings-repository
 ** -W (force asking password), in this setup username/password are the same
 
 
-F: Problem(s) and Solutions
+Problem(s) and Solutions
 ---------------------------
 **Problem:** 
 ```
