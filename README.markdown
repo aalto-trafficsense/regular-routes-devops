@@ -1,11 +1,15 @@
 regular-routes DevOps repository
 ================================
 
-Preparing local development environment
+Preparing a local development environment
 ------------------------------------------
 
-1. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):  
-        `curl -L -O https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.6.0-1_amd64.deb`  
+The local development environment is used for coding new features for the server. The local environment is necessary also for setting up remote servers.
+
+1. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):
+* For Mac OSX install from browser as instructed on the website.
+* For Debian / Ubuntu command line it is also possible to move to a folder where it is ok to download the installation file. The following commands may work, but please check the version number:
+`curl -L -O https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.6.0-1_amd64.deb`  
         `sudo dpkg -i chefdk_0.6.0-1_amd64.deb`  
 1. Install git if not present
         `apt-get install git`
@@ -14,8 +18,15 @@ Preparing local development environment
 
 _Note: The local development environment is not recommended for the server._
   
-Create the local JSON file
------------------------------
+Preparing configurations
+------------------------
+
+The local JSON and conf files are needed for authentication. The keys are generated:
+1. In the Google developer console
+* For the database
+The path and name of the local JSON file will be configured during the setup of the remote TrafficSense server.
+For local TrafficSense purposes sample configuration files are available in the "release-key" directory of the project folder.
+
     {
       "override": {
         "regularroutes": {
@@ -27,32 +38,52 @@ Create the local JSON file
     }
 
 
-A: Setting up development server at Digital Ocean
-----------------------------------------
+A: Setting up a remote TrafficSense server
+------------------------------------------
 
+These instructions are for setting up servers over a network connection. Servers on Digital Ocean are fully featured TrafficSense servers for temporary testing. Can be used for e.g. database population, client testing against a temporary server.
+
+1. Set up the local development environment as instructed above.
+1. *If* a new server is needed: Setup a new virtual server e.g. at [Digital Ocean](https://www.digitalocean.com)
 1. IN LOCAL DESKTOP: package cookbooks (automatically resolves and includes dependencies)  
         `cd regular-routes-devops`  
         `berks package`  
-        --> creates a file named like `cookbooks-1432555542.tar.gz`
+        --> creates a file named something like `cookbooks-1432555542.tar.gz`
 
         _Alternative: `berks vendor <path>`creates the files directly to <path>. One good path is `..` But BEWARE, this may cleanup your whole directory structure._
-
-1. Setup a new virtual server at [Digital Ocean](https://www.digitalocean.com)
-1. Login to server using SSH client
+1. IN LOCAL DESKTOP: copy cookbook package from local workstation to newly created server at digital ocean  
+        `scp cookbooks-1432555542.tar.gz user@host:.`
+1. Login to your server using SSH client
 1. [Install Chef client](https://www.chef.io/download-chef-client/):  
         `curl -L https://www.chef.io/chef/install.sh | sudo bash`  
-1. IN LOCAL DESKTOP: copy cookbook package from local workstation to newly created server at digital ocean  
-        `scp cookbooks-1432555542.tar.gz user@host ...`
-1. Update packages by running `apt-get update`
+1. Update packages by running `sudo apt-get update`
 1. Unzip cookbook package  
         `tar xfz cookbooks-1432555542.tar.gz`  
-1. Copy regularroutes.json file (content and format describe above) from your local desktop to the server   
+1. Generate the keys necessary keys on the Google developer console (instructions TBA)
+1. Generate JSON-file (default: `regularroutes.json`) with the keys in the format below on the server (note: Local TrafficSense developers in Otaniemi - sample configurations available in the project directory):
+
+    {
+      "override": {
+        "regularroutes": {
+          "maps_api_key" : "<create in Google console>",
+          "db_password": "<create for the database>"
+        }
+      },
+      "run_list": ["recipe[regularroutes]"]
+    }
+    
 1. Populate the OSM database (run osm recipe in local mode)  
         `sudo chef-client --local-mode --runlist 'recipe[regularroutes::osm]' -j ../regularroutes.json`  
         _Note: Currently memory-hungry. May fail if the server doesn't have enough memory._
 1. Setup server (run default recipe in local mode)  
         `sudo chef-client --local-mode --runlist 'recipe[regularroutes]' -j ../regularroutes.json`
-1. Copy client_secrets.json to `/opt/regularroutes`
+1. Generate a client_secrets.json in the Google Developer console
+* Open https://console.developers.google.com
+* Go to APIs & auth / Credentials / Add credentials / 
+* Unless an existing signing key is available, a new keystore can be generated manually (https://developer.android.com/tools/publishing/app-signing.html): <<< CONTINUE FROM HERE >>>
+        `keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000`
+** Generate "API Key / Android Key": 
+1. Copy client_secrets.json to `/opt/regularroutes` on your server
 1. Rectify user rights  
     `chgrp lerero client_secrets.json`  
     `chmod 0640 client_secrets.json`  
