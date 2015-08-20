@@ -7,9 +7,9 @@ Preparing a local development environment
 The local development environment is used for coding new features for the server. The local environment is necessary also for setting up remote servers.
 
 1. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):
-* For Mac OSX install from browser as instructed on the website.
-* For Debian / Ubuntu also command line installation works. Please check the version number, when using the following:
-`curl -L -O https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.6.0-1_amd64.deb`  
+ ** For Mac OSX install from browser as instructed on the website.
+ ** For Debian / Ubuntu also command line installation works. Please check the version number, when using the following:
+        `curl -L -O https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.6.0-1_amd64.deb`  
         `sudo dpkg -i chefdk_0.6.0-1_amd64.deb`  
 1. Install git if not present
         `apt-get install git`
@@ -17,26 +17,6 @@ The local development environment is used for coding new features for the server
         `git clone https://github.com/aalto-trafficsense/regular-routes-devops.git`
 
 _Note: The local development environment is not recommended for the server._
-  
-Preparing configurations
-------------------------
-
-The local JSON and conf files are needed for authentication. The keys are generated:
-1. In the Google developer console
-* For the database
-The path and name of the local JSON file will be configured during the setup of the remote TrafficSense server.
-For local TrafficSense purposes sample configuration files are available in the "release-key" directory of the project folder.
-
-    {
-      "override": {
-        "regularroutes": {
-          "maps_api_key" : "<create in Google console>",
-          "db_password": "<create for the database>"
-        }
-      },
-      "run_list": ["recipe[regularroutes]"]
-    }
-
 
 A: Setting up a remote TrafficSense server
 ------------------------------------------
@@ -59,10 +39,10 @@ These instructions are for setting up servers over a network connection. Servers
 1. Update packages by running `sudo apt-get update`
 1. Unzip cookbook package  
         `tar xfz cookbooks-1432555542.tar.gz`  
-1. Generate the necessary keys on the Google developer console (instructions TBA)
-* [A signing key](https://developer.android.com/tools/publishing/app-signing.html) needs to be made available. If you don't have one yet, manual generation (typically locally) can be done with: `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 ` A password for the keystore and a key password are needed - remember or write down!
-* Open https://console.developers.google.com
-* Go to APIs & auth / Credentials / Add credentials / Android key
+1. Generate the necessary keys on the Google developer console
+** [A signing key](https://developer.android.com/tools/publishing/app-signing.html) needs to be made available. If you don't have one yet, manual generation (typically locally) can be done with: `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 ` A password for the keystore and a key password are needed - remember or write down!
+** Open https://console.developers.google.com
+** Go to APIs & auth / Credentials / Add credentials / Android key
 ** Retrieve the SHA-1 certificate fingerprint as instructed on the page
 ** Enter the package name matching the one in the client AndroidManifest.xml (currently fi.aalto.trafficsense.regularroutes, but may be changed)
 ** Enable the "Google Maps Android v2 API" under APIs & Auth / APIs
@@ -92,23 +72,28 @@ These instructions are for setting up servers over a network connection. Servers
         `sudo chef-client --local-mode --runlist 'recipe[regularroutes::osm]' -j ../regularroutes.json`  
         _Note: Does not work on Ubuntu 12.04, requires v. 14 or higher. Also memory-hungry. May fail if the server doesn't have enough memory._
 1. *IF* population was done on another server than the intended production server, package and transfer the resulting osm database to the production server:
-*        `pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t > my_database.dump`
-*        _TBD: Whether pg_dumpall would be better?_
-*        Pack: `gzip my_database.dump`
-* Transfer `my_database.dump.gz` to your intended TrafficSense server. E.g. with scp.
-* Unpack: `gunzip my_database.dump.gz`
-* If a separate server was used just for database population, it is no longer needed after this step.
+** `pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t > my_database.dump`
+** _TBD: Whether pg_dumpall would be better?_
+** Pack: `gzip my_database.dump`
+** Transfer `my_database.dump.gz` to your intended TrafficSense server. E.g. with scp.
+** Unpack: `gunzip my_database.dump.gz`
+** Restore the database: `pg_restore -h 127.0.0.1 -U regularroutes -W -d regularroutes my_database.dump`
+** Another way with text-format dump to be tested
+** If a separate server was used just for database population, it is no longer needed after this step.
 1. Setup production server (run default recipe in local mode)  
-        `sudo chef-client --local-mode --runlist 'recipe[regularroutes]' -j ../regularroutes.json`
+** `sudo chef-client --local-mode --runlist 'recipe[regularroutes]' -j ../regularroutes.json`
 1. Generate a client_secrets.json in the Google Developer console
-
-
-1. Copy client_secrets.json to `/opt/regularroutes` on your server
+** Set up a product name in the APIs & auth / Credentials / OAuth consent screen
+** APIs & Auth / Credentials / Create an OAuth client id. Application type: Web application. Authorized JavaScript origin & Authorized redirect URIs will have your server http address like "http://regularroutes.mydomain.xx"
+** Copy the returned client_ID to your Android client project. File `regularroutes/src/main/assets/regularroutes.conf`, line web_cl_id.
+** Use the download link on the OAuth 2.0 client ID to download the client_secrets.json
+** Copy client_secrets.json to `/opt/regularroutes` on your server
 1. Rectify user rights  
-    `chgrp lerero client_secrets.json`  
-    `chmod 0640 client_secrets.json`  
+** `cd /out/regularroutes`
+** `sudo chgrp lerero client_secrets.json`  
+** `sudo chmod 0640 client_secrets.json`  
 1. Start the server  
-    `restart regularroutes`  
+    `sudo restart regularroutes`  
 
 Logs will be in `/var/log/upstart/`
 
