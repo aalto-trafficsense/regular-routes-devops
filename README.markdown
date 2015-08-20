@@ -44,7 +44,7 @@ A: Setting up a remote TrafficSense server
 These instructions are for setting up servers over a network connection. Servers on Digital Ocean are fully featured TrafficSense servers for temporary testing. Can be used for e.g. database population, client testing against a temporary server. Unless specifically noted otherwise, all steps are needed for setting up both types of servers.
 
 1. Set up the local development environment as instructed above.
-1. *If* a new server is needed: Setup a new virtual server e.g. at [Digital Ocean](https://www.digitalocean.com)
+1. *If* a new server is needed: Setup a new virtual server e.g. at [Digital Ocean](https://www.digitalocean.com). For database population (e.g. Finland) > 2GB memory is required. On an 8 CPU / 16GB server database population on Finland took 23 mins.
 1. In your *local development environment*: package cookbooks (automatically resolves and includes dependencies)  
         `cd regular-routes-devops`  
         `berks package`  
@@ -60,6 +60,13 @@ These instructions are for setting up servers over a network connection. Servers
 1. Unzip cookbook package  
         `tar xfz cookbooks-1432555542.tar.gz`  
 1. Generate the necessary keys on the Google developer console (instructions TBA)
+* [A signing key](https://developer.android.com/tools/publishing/app-signing.html) needs to be made available. If you don't have one yet, manual generation (typically locally) can be done with: `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 ` A password for the keystore and a key password are needed - remember or write down!
+* Open https://console.developers.google.com
+* Go to APIs & auth / Credentials / Add credentials / Android key
+** Retrieve the SHA-1 certificate fingerprint as instructed on the page
+** Enter the package name matching the one in the client AndroidManifest.xml (currently fi.aalto.trafficsense.regularroutes, but may be changed)
+** Enable the "Google Maps Android v2 API" under APIs & Auth / APIs
+** Copy the generated API key into the "maps_api_key" in your `regularroutes.json`file.
 1. Generate a JSON-file with the keys (`regularroutes.json`in the instructions). Depending on whether you are creating populating map data on a temporary server or generating a new server, the contents have some differences as outlined below.
 1. *IF* generating a map population server:
 
@@ -85,19 +92,17 @@ These instructions are for setting up servers over a network connection. Servers
         `sudo chef-client --local-mode --runlist 'recipe[regularroutes::osm]' -j ../regularroutes.json`  
         _Note: Does not work on Ubuntu 12.04, requires v. 14 or higher. Also memory-hungry. May fail if the server doesn't have enough memory._
 1. *IF* population was done on another server than the intended production server, package and transfer the resulting osm database to the production server:
-*        `pg_dump dbname > outfile`
-* Transfer to the newly generated server.
-* If a separate server was used for database population, it is no longer needed after this step.
+*        `pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t > my_database.dump`
+*        _TBD: Whether pg_dumpall would be better?_
+*        Pack: `gzip my_database.dump`
+* Transfer `my_database.dump.gz` to your intended TrafficSense server. E.g. with scp.
+* Unpack: `gunzip my_database.dump.gz`
+* If a separate server was used just for database population, it is no longer needed after this step.
 1. Setup production server (run default recipe in local mode)  
         `sudo chef-client --local-mode --runlist 'recipe[regularroutes]' -j ../regularroutes.json`
 1. Generate a client_secrets.json in the Google Developer console
-* [A signing key](https://developer.android.com/tools/publishing/app-signing.html) needs to be made available. Manual generation (typically locally) can be done with: `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 ` A password for the keystore and a key password are needed.
-* Open https://console.developers.google.com
-* Go to APIs & auth / Credentials / Add credentials / Android key
-* 
-* , a new keystore can be generated manually.  (https://developer.android.com/tools/publishing/app-signing.html): <<< CONTINUE FROM HERE >>>
-        `keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000`
-** Generate "API Key / Android Key": 
+
+
 1. Copy client_secrets.json to `/opt/regularroutes` on your server
 1. Rectify user rights  
     `chgrp lerero client_secrets.json`  
@@ -168,3 +173,9 @@ $ sudo -u postgres psql
 In postgres:
 > DROP DATABASE regularroutes ;
 > DROP USER regularroutes ;
+
+**Problem:**
+Need to copy (scp) files between two machines because there is no direct ssh connectivity to the server.
+
+**Solution:**
+Do the scp from the receiving site.
