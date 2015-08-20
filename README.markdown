@@ -6,14 +6,14 @@ Preparing a local development environment
 
 The local development environment is used for coding new features for the server. The local environment is necessary also for setting up remote servers.
 
-1. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):
- ** For Mac OSX install from browser as instructed on the website.
- ** For Debian / Ubuntu also command line installation works. Please check the version number, when using the following:
+# Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):
+    ## For Mac OSX install from browser as instructed on the website.
+    ## For Debian / Ubuntu also command line installation works. Please check the version number, when using the following:
         `curl -L -O https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.6.0-1_amd64.deb`  
         `sudo dpkg -i chefdk_0.6.0-1_amd64.deb`  
-1. Install git if not present
+# Install git if not present
         `apt-get install git`
-1. Clone regular-routes-devops repo:  
+# Clone regular-routes-devops repo:  
         `git clone https://github.com/aalto-trafficsense/regular-routes-devops.git`
 
 _Note: The local development environment is not recommended for the server._
