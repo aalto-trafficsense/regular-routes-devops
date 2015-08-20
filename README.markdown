@@ -8,7 +8,7 @@ The local development environment is used for coding new features for the server
 
 1. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):
 * For Mac OSX install from browser as instructed on the website.
-* For Debian / Ubuntu command line it is also possible to move to a folder where it is ok to download the installation file. The following commands may work, but please check the version number:
+* For Debian / Ubuntu also command line installation works. Please check the version number, when using the following:
 `curl -L -O https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.6.0-1_amd64.deb`  
         `sudo dpkg -i chefdk_0.6.0-1_amd64.deb`  
 1. Install git if not present
@@ -41,11 +41,11 @@ For local TrafficSense purposes sample configuration files are available in the 
 A: Setting up a remote TrafficSense server
 ------------------------------------------
 
-These instructions are for setting up servers over a network connection. Servers on Digital Ocean are fully featured TrafficSense servers for temporary testing. Can be used for e.g. database population, client testing against a temporary server.
+These instructions are for setting up servers over a network connection. Servers on Digital Ocean are fully featured TrafficSense servers for temporary testing. Can be used for e.g. database population, client testing against a temporary server. Unless specifically noted otherwise, all steps are needed for setting up both types of servers.
 
 1. Set up the local development environment as instructed above.
 1. *If* a new server is needed: Setup a new virtual server e.g. at [Digital Ocean](https://www.digitalocean.com)
-1. IN LOCAL DESKTOP: package cookbooks (automatically resolves and includes dependencies)  
+1. In your *local development environment*: package cookbooks (automatically resolves and includes dependencies)  
         `cd regular-routes-devops`  
         `berks package`  
         --> creates a file named something like `cookbooks-1432555542.tar.gz`
@@ -59,28 +59,43 @@ These instructions are for setting up servers over a network connection. Servers
 1. Update packages by running `sudo apt-get update`
 1. Unzip cookbook package  
         `tar xfz cookbooks-1432555542.tar.gz`  
-1. Generate the keys necessary keys on the Google developer console (instructions TBA)
-1. Generate JSON-file (default: `regularroutes.json`) with the keys in the format below on the server (note: Local TrafficSense developers in Otaniemi - sample configurations available in the project directory):
+1. Generate the necessary keys on the Google developer console (instructions TBA)
+1. Generate a JSON-file with the keys (`regularroutes.json`in the instructions). Depending on whether you are creating populating map data on a temporary server or generating a new server, the contents have some differences as outlined below.
+1. *IF* generating a map population server:
 
     {
-      "override": {
+      "regularroutes": {
+        "db_password": "<generate for the database>",
+        "osm_url": "http://download.geofabrik.de/europe/finland-latest.osm.pbf"
+      },
+      "run_list": ["recipe[regularroutes::osm]"]
+    }
+
+1. *IF* generating a production server*:
+
+    {
         "regularroutes": {
           "maps_api_key" : "<create in Google console>",
           "db_password": "<create for the database>"
-        }
-      },
+        },
       "run_list": ["recipe[regularroutes]"]
     }
-    
+
 1. Populate the OSM database (run osm recipe in local mode)  
         `sudo chef-client --local-mode --runlist 'recipe[regularroutes::osm]' -j ../regularroutes.json`  
-        _Note: Currently memory-hungry. May fail if the server doesn't have enough memory._
-1. Setup server (run default recipe in local mode)  
+        _Note: Does not work on Ubuntu 12.04, requires v. 14 or higher. Also memory-hungry. May fail if the server doesn't have enough memory._
+1. *IF* population was done on another server than the intended production server, package and transfer the resulting osm database to the production server:
+*        `pg_dump dbname > outfile`
+* Transfer to the newly generated server.
+* If a separate server was used for database population, it is no longer needed after this step.
+1. Setup production server (run default recipe in local mode)  
         `sudo chef-client --local-mode --runlist 'recipe[regularroutes]' -j ../regularroutes.json`
 1. Generate a client_secrets.json in the Google Developer console
+* [A signing key](https://developer.android.com/tools/publishing/app-signing.html) needs to be made available. Manual generation (typically locally) can be done with: `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 ` A password for the keystore and a key password are needed.
 * Open https://console.developers.google.com
-* Go to APIs & auth / Credentials / Add credentials / 
-* Unless an existing signing key is available, a new keystore can be generated manually (https://developer.android.com/tools/publishing/app-signing.html): <<< CONTINUE FROM HERE >>>
+* Go to APIs & auth / Credentials / Add credentials / Android key
+* 
+* , a new keystore can be generated manually.  (https://developer.android.com/tools/publishing/app-signing.html): <<< CONTINUE FROM HERE >>>
         `keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000`
 ** Generate "API Key / Android Key": 
 1. Copy client_secrets.json to `/opt/regularroutes` on your server
