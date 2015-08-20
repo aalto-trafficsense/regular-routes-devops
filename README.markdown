@@ -84,7 +84,7 @@ These instructions are for setting up servers over a network connection. Servers
 ** `sudo chef-client --local-mode --runlist 'recipe[regularroutes]' -j ../regularroutes.json`
 1. Generate a client_secrets.json in the Google Developer console
 ** Set up a product name in the APIs & auth / Credentials / OAuth consent screen
-** APIs & Auth / Credentials / Create an OAuth client id. Application type: Web application. Authorized JavaScript origin & Authorized redirect URIs will have your server http address like "http://regularroutes.mydomain.xx"
+** APIs & Auth / Credentials / Create an OAuth client id. Application type: Web application. Authorized JavaScript origin & Authorized redirect URIs need two addresses each, as explained [here](https://github.com/aalto-trafficsense/regular-routes-client/blob/master/README.markdown#31-build-new-ids-in-google-developer-console).
 ** Copy the returned client_ID to your Android client project. File `regularroutes/src/main/assets/regularroutes.conf`, line web_cl_id.
 ** Use the download link on the OAuth 2.0 client ID to download the client_secrets.json
 ** Copy client_secrets.json to `/opt/regularroutes` on your server
