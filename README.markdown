@@ -40,13 +40,12 @@ These instructions are for setting up servers over a network connection. Servers
 1. Unzip cookbook package  
         `tar xfz cookbooks-1432555542.tar.gz`  
 1. Generate the necessary keys on the Google developer console
-    * [A signing key](https://developer.android.com/tools/publishing/app-signing.html) needs to be made available. If you don't have one yet, manual generation (typically locally) can be done with: `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 ` A password for the keystore and a key password are needed - remember or write down!
-    * Open https://console.developers.google.com
-    * Go to APIs & auth / Credentials / Add credentials / Android key
-    * Retrieve the SHA-1 certificate fingerprint as instructed on the page
-    * Enter the package name matching the one in the client AndroidManifest.xml (currently fi.aalto.trafficsense.regularroutes, but may be changed)
-    * Enable the "Google Maps Android v2 API" under APIs & Auth / APIs
-    * Copy the generated API key into the "maps_api_key" in your `regularroutes.json`file.
+     * [A signing key](https://developer.android.com/tools/publishing/app-signing.html) needs to be made available. If you don't have one yet, manual generation (typically locally) can be done with: `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 ` A password for the keystore and a key password are needed - remember or write down!
+     * Open https://console.developers.google.com
+     * Go to APIs & auth / Credentials / Add credentials / API Key / Browser key
+     * Enter host name like `regularroutes.niksula.hut.fi/*' into HTTP referrers field
+     * Enable the "Google Maps JavaScript API" under APIs & Auth / APIs
+     * Copy the generated API key into the "maps_api_key" in your `regularroutes.json`file.
 1. Generate a JSON-file with the keys (`regularroutes.json`in the instructions). Depending on whether you are creating populating map data on a temporary server or generating a new server, the contents have some differences as outlined below.
 1. *IF* generating a map population server:
 
