@@ -43,7 +43,7 @@ These instructions are for setting up servers over a network connection. Servers
      * [A signing key](https://developer.android.com/tools/publishing/app-signing.html) needs to be made available. If you don't have one yet, manual generation (typically locally) can be done with: `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 ` A password for the keystore and a key password are needed - remember or write down!
      * Open https://console.developers.google.com
      * Go to APIs & auth / Credentials / Add credentials / API Key / Browser key
-     * Enter host name like `regularroutes.niksula.hut.fi/*' into HTTP referrers field
+     * Enter host name like `regularroutes.niksula.hut.fi/*` into HTTP referrers field
      * Enable the "Google Maps JavaScript API" under APIs & Auth / APIs
      * Copy the generated API key into the "maps_api_key" in your `regularroutes.json`file.
 1. Generate a JSON-file with the keys (`regularroutes.json`in the instructions). Depending on whether you are creating populating map data on a temporary server or generating a new server, the contents have some differences as outlined below.
