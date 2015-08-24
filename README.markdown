@@ -49,23 +49,23 @@ These instructions are for setting up servers over a network connection. Remote 
 1. Generate a JSON-file for the keys. Depending on whether you are populating map data on a temporary server or generating a new server, the format is slightly different.
 1. For the purpose of *generating waypoints from a map* (`regularroutes-wpts.json`):
 
-    {
-      "regularroutes": {
-        "db_password": "<generate for the database>",
-        "osm_url": "http://download.geofabrik.de/europe/finland-latest.osm.pbf"
-      },
-      "run_list": ["recipe[regularroutes::osm]"]
-    }
+    ```{  
+      "regularroutes": {  
+        "db_password": "<generate for the database>",  
+        "osm_url": "http://download.geofabrik.de/europe/finland-latest.osm.pbf"  
+      },  
+      "run_list": ["recipe[regularroutes::osm]"]  
+    }  ```
     
 1. For a *production server* (`regularroutes-srvr.json`):
 
-    {
-        "regularroutes": {
-          "maps_api_key" : "<created in Google console>",
-          "db_password": "<generate for the database>"
-        },
-      "run_list": ["recipe[regularroutes]"]
-    }
+    ```{  
+        "regularroutes": {  
+          "maps_api_key" : "<created in Google console>",  
+          "db_password": "<generate for the database>"  
+        },  
+      "run_list": ["recipe[regularroutes]"]  
+    }```
 
 1. Generate waypoints (run osm recipe in local mode)  
         `sudo chef-client --local-mode -j ../regularroutes-wpts.json`  
