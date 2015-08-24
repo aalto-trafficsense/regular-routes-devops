@@ -8,7 +8,7 @@ The local development environment is used for coding new features for the server
 
 1. Install [Chef Development Kit](https://downloads.getchef.com/chef-dk/):
     * For Mac OSX install from browser as instructed on the website.
-    * For Debian / Ubuntu also command line installation works. Please check the version number, when using the following:
+    * For Debian / Ubuntu also command line installation works. Please check the version number, when using the following:  
         `curl -L -O https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.6.0-1_amd64.deb`  
         `sudo dpkg -i chefdk_0.6.0-1_amd64.deb`  
 1. Install git if not present
@@ -21,7 +21,7 @@ _Note: The local development environment is not recommended for the server._
 A: Setting up a remote TrafficSense server
 ------------------------------------------
 
-These instructions are for setting up servers over a network connection. Servers on Digital Ocean are fully featured TrafficSense servers for temporary testing. Can be used for e.g. database population, client testing against a temporary server. Unless specifically noted otherwise, all steps are needed for setting up both types of servers.
+These instructions are for setting up servers over a network connection. Remote servers on e.g. [Digital Ocean](https://www.digitalocean.com/) are fully featured TrafficSense servers for temporary testing. Can be used for e.g. database population or client testing against a temporary server. Unless specifically noted otherwise, the same initial steps are needed for setting up both types of servers.
 
 1. Set up the local development environment as instructed above.
 1. *If* a new server is needed: Setup a new virtual server e.g. at [Digital Ocean](https://www.digitalocean.com). For database population (e.g. Finland) > 2GB memory is required. On an 8 CPU / 16GB server database population on Finland took 23 mins.
@@ -31,23 +31,23 @@ These instructions are for setting up servers over a network connection. Servers
         --> creates a file named something like `cookbooks-1432555542.tar.gz`
 
         _Alternative: `berks vendor <path>`creates the files directly to <path>. One good path is `..` But BEWARE, this may cleanup your whole directory structure._
-1. IN LOCAL DESKTOP: copy cookbook package from local workstation to newly created server at digital ocean  
+1. Copy the newly generated cookbook package from your local workstation to the target server  
         `scp cookbooks-1432555542.tar.gz user@host:.`
 1. Login to your server using SSH client
-1. [Install Chef client](https://www.chef.io/download-chef-client/):  
+1. [Install Chef client](https://wwan w.chef.io/download-chef-client/):  
         `curl -L https://www.chef.io/chef/install.sh | sudo bash`  
 1. Update packages by running `sudo apt-get update`
-1. Unzip cookbook package  
+1. Unzip the cookbook package  
         `tar xfz cookbooks-1432555542.tar.gz`  
 1. Generate the necessary keys on the Google developer console
      * [A signing key](https://developer.android.com/tools/publishing/app-signing.html) needs to be made available. If you don't have one yet, manual generation (typically locally) can be done with: `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 ` A password for the keystore and a key password are needed - remember or write down!
      * Open https://console.developers.google.com
      * Go to APIs & auth / Credentials / Add credentials / API Key / Browser key
-     * Enter host name like `regularroutes.niksula.hut.fi/*` into HTTP referrers field
+     * Enter host name like `regularroutes.niksula.hut.fi/*` into the HTTP referrers field
      * Enable the "Google Maps JavaScript API" under APIs & Auth / APIs
-     * Copy the generated API key into the "maps_api_key" in your `regularroutes.json`file.
-1. Generate a JSON-file with the keys (`regularroutes.json`in the instructions). Depending on whether you are creating populating map data on a temporary server or generating a new server, the contents have some differences as outlined below.
-1. *IF* generating a map population server:
+     * Copy the generated API key into the "maps_api_key" into your `regularroutes.json`file, as instructed below.
+1. Generate a JSON-file for the keys. Depending on whether you are populating map data on a temporary server or generating a new server, the format is slightly different.
+1. For the purpose of *generating waypoints from a map* (`regularroutes-wpts.json`):
 
     {
       "regularroutes": {
@@ -56,31 +56,31 @@ These instructions are for setting up servers over a network connection. Servers
       },
       "run_list": ["recipe[regularroutes::osm]"]
     }
-
-1. *IF* generating a production server:
+    
+1. For a *production server* (`regularroutes-srvr.json`):
 
     {
         "regularroutes": {
-          "maps_api_key" : "<create in Google console>",
-          "db_password": "<create for the database>"
+          "maps_api_key" : "<created in Google console>",
+          "db_password": "<generate for the database>"
         },
       "run_list": ["recipe[regularroutes]"]
     }
 
-1. Populate the OSM database (run osm recipe in local mode)  
-        `sudo chef-client --local-mode --runlist 'recipe[regularroutes::osm]' -j ../regularroutes.json`  
+1. Generate waypoints (run osm recipe in local mode)  
+        `sudo chef-client --local-mode -j ../regularroutes-wpts.json`  
         _Note: Does not work on Ubuntu 12.04, requires v. 14 or higher. Also memory-hungry. May fail if the server doesn't have enough memory._
 1. *IF* population was done on another server than the intended production server, package and transfer the resulting osm database to the production server:
     * `pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t > my_database.dump`
     * _TBD: Whether pg_dumpall would be better?_
     * Pack: `gzip my_database.dump`
-    * Transfer `my_database.dump.gz` to your intended TrafficSense server. E.g. with scp.
+    * Transfer `my_database.dump.gz` to your intended TrafficSense server e.g. with scp.
     * Unpack: `gunzip my_database.dump.gz`
     * Restore the database: `pg_restore -h 127.0.0.1 -U regularroutes -W -d regularroutes my_database.dump`
-    * Another way with text-format dump to be tested
-    * If a separate server was used just for database population, it is no longer needed after this step.
+    * _Another way with text-format dump to be tested_
+    * _Note: If a separate server was used just for database population, it is no longer needed after this step._
 1. Setup production server (run default recipe in local mode)  
-    * `sudo chef-client --local-mode --runlist 'recipe[regularroutes]' -j ../regularroutes.json`
+    `sudo chef-client --local-mode -j ../regularroutes-srvr.json`
 1. Generate a client_secrets.json in the Google Developer console
     * Set up a product name in the APIs & auth / Credentials / OAuth consent screen
     * APIs & Auth / Credentials / Create an OAuth client id. Application type: Web application. Authorized JavaScript origin & Authorized redirect URIs need two addresses each, as explained [here](https://github.com/aalto-trafficsense/regular-routes-client/blob/master/README.markdown#31-build-new-ids-in-google-developer-console).
@@ -112,6 +112,7 @@ B: Setting up local development server using Virtualbox and Vagrant
 Importing Open Street map data from crossings-repository
 --------------------------------------------------------
 
+TBD: Explain who needs this and for what.
 
 * Remarks 1: Waypoint (crossings) data is in Open Street Map (osm) formatting
 * Remarks 2: This instructions expects you to have vagrant up and running with PostgreSQL (+PostGIS) database service up & running and port forwarding to db service to port 5432 at localhost 
