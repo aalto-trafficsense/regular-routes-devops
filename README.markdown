@@ -47,7 +47,7 @@ These instructions are for setting up servers over a network connection. Remote 
      * Enable the "Google Maps JavaScript API" under APIs & Auth / APIs
      * Copy the generated API key into the "maps_api_key" into your `regularroutes.json`file, as instructed below.
 1. Generate a JSON-file for the keys. Depending on whether you are populating map data on a temporary server or generating a new server, the format is slightly different.
-1. For the purpose of *generating waypoints from a map* (`regularroutes-wpts.json`):
+     * For the purpose of *generating waypoints from a map* (`regularroutes-wpts.json`):
 
     ```{  
       "regularroutes": {  
@@ -57,7 +57,7 @@ These instructions are for setting up servers over a network connection. Remote 
       "run_list": ["recipe[regularroutes::osm]"]  
     }  ```
     
-1. For a *production server* (`regularroutes-srvr.json`):
+     * For a *production server* (`regularroutes-srvr.json`):
 
     ```{  
         "regularroutes": {  
