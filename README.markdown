@@ -16,42 +16,56 @@ The local development environment is used for coding new features for the server
 1. Clone regular-routes-devops repo:  
         `git clone https://github.com/aalto-trafficsense/regular-routes-devops.git`
 
-_Note: The local development environment is not recommended for the server._
+_Note: The local development environment is neither required nor recommended for the server._
 
 A: Setting up a remote TrafficSense server
 ------------------------------------------
 
-These instructions are for setting up servers over a network connection. Remote servers on e.g. [Digital Ocean](https://www.digitalocean.com/) are fully featured TrafficSense servers for temporary testing. Can be used for e.g. database population or client testing against a temporary server. Unless specifically noted otherwise, the same initial steps are needed for setting up both types of servers.
+These instructions are for setting up servers over a network connection. Temporary servers on e.g. [Digital Ocean](https://www.digitalocean.com/) can act as fully featured TrafficSense servers for e.g. database population or client testing. Unless specifically noted otherwise, the same initial steps are needed both for local and remote servers.
 
 1. Set up the local development environment as instructed above.
 1. *If* a new server is needed: Setup a new virtual server e.g. at [Digital Ocean](https://www.digitalocean.com). For database population (e.g. Finland) > 2GB memory is required. On an 8 CPU / 16GB server database population on Finland took 23 mins.
-1. In your *local development environment*: package cookbooks (automatically resolves and includes dependencies)  
+1. Package cookbooks in your *local development environment* (automatically resolves and includes dependencies):
         `cd regular-routes-devops`  
         `berks package`  
         --> creates a file named something like `cookbooks-1432555542.tar.gz`
-
         _Alternative: `berks vendor <path>`creates the files directly to <path>. One good path is `..` But BEWARE, this may cleanup your whole directory structure._
 1. Copy the newly generated cookbook package from your local workstation to the target server  
         `scp cookbooks-1432555542.tar.gz user@host:.`
-1. Login to your server using SSH client
+1. Login to your server (e.g. with SSH)
 1. [Install Chef client](https://wwan w.chef.io/download-chef-client/):  
         `curl -L https://www.chef.io/chef/install.sh | sudo bash`  
 1. Update packages by running `sudo apt-get update`
-1. Unzip the cookbook package  
-        `tar xfz cookbooks-1432555542.tar.gz`  
-1. Generate the necessary keys on the Google developer console
-     * [A signing key](https://developer.android.com/tools/publishing/app-signing.html) needs to be made available. If you don't have one yet, manual generation (typically locally) can be done with: `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 ` A password for the keystore and a key password are needed - remember or write down!
-     * Open https://console.developers.google.com
-     * Go to APIs & auth / Credentials / Add credentials / API Key / Browser key
-     * Enter a host name like `regularroutes.niksula.hut.fi/*` into the HTTP referrers field
-     * Generate (under "Add credentials") also a client ID for Web Applications. Requires the following information under "Authorized Javascript origins":
-    http://<server URL>
-    http://localhost:5000
-     * Authorized redirect URIs (OAuth2Callback) should be filled in automatically.
-     * Press "Download JSON" (for the Web Applications) to get the JSON-version of the client secret. Select "Client ID for Android Applications". Package name: "fi.aalto.trafficsense.regularroutes". SHA1 generated from the release key.
-     * Enable the "Google Maps JavaScript API" under APIs & Auth / APIs
-     * Copy the generated API key into the "maps_api_key" into your `regularroutes.json`file, as instructed below.
-1. Generate a JSON-file for the keys. Depending on whether you are populating map data on a temporary server or generating a new server, the format is slightly different.
+1. Unzip the cookbook package `tar xfz cookbooks-1432555542.tar.gz`
+1. [A signing key](https://developer.android.com/tools/publishing/app-signing.html) must be available. If you don't have one yet, manual generation (typically locally) can be done with:
+        `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 `
+        _A password for the keystore and a key password are needed - remember or write down!_
+1. Generate the necessary keys on the [Google developer console](https://console.developers.google.com)
+     * If no project available: Set up a new project
+     * Fill in the "Product name" field (to be shown to users at login-time) on "APIs & auth" / "Credentials" / "OAuth consent screen"
+     * Enable "Google Maps JavaScript API" under "APIs & Auth" / "APIs"
+     * Generate three credentials under "APIs & Auth" / "Credentials" / "Credentials": "Add credentials" as follows
+     * 1. OAuth web client ID, which the server will use towards Google APIs: "OAuth 2.0 client ID" with the following information:
+        * Application type: Web application.
+        * `Authorized JavaScript origins`
+           * http://my.server.url
+           * http://localhost:5000
+        * `Authorized redirect URIs` should fill in automatically.
+        * Press "Create"
+        * Select the generated Web client ID (default "Web client 1") and download a JSON-version of the _client secret_ by pressing "Download JSON" and saving the file as "client_secrets.json" to `/opt/regularroutes` on your server 
+     * 2. Browser API key to be used for Google maps access: "API Key"
+        * Select "Browser key". The default name will be "Browser key 1"
+        * Enter a host name like `my.server.url/*` into the "Accept requests from these HTTP referrers" field
+        * Press "Create"
+        * Copy the "Key" (looks like "AIzaSjs8iSef...") to the "maps_api_key" of your `regularroutes-srvr.json`file, shown below.
+     * 3. Android client ID: "OAuth 2.0 client ID" with the following information:
+        * Application type: Android
+        * Signing-certificate fingerprint. This comes from the signing key keystore generated earlier.
+        * Package name: From the "AndroidManifest.xml" file in the client: "fi.aalto.trafficsense.regularroutes"
+        * Google+ deep linking is not used.
+        * Press "Create"
+        * Copy the "Client ID" (looks like "7948743243-hsuefse3hisefssef.apps.googleuser...") to your regular-routes-client project; file `regularroutes/src/main/assets/regularroutes.conf`, line `web_cl_id`.
+1. Generate suitable JSON-files for your next operations. Depending on whether you are populating map data on a temporary server or generating a new server, the format is slightly different.
      * For the purpose of *generating waypoints from a map* (`regularroutes-wpts.json`):
 
     ```{  
@@ -86,12 +100,6 @@ These instructions are for setting up servers over a network connection. Remote 
     * _Note: If a separate server was used just for database population, it is no longer needed after this step._
 1. Setup production server (run default recipe in local mode)  
     `sudo chef-client --local-mode -j ../regularroutes-srvr.json`
-1. Generate a client_secrets.json in the Google Developer console
-    * Set up a product name in the APIs & auth / Credentials / OAuth consent screen
-    * APIs & Auth / Credentials / Create an OAuth client id. Application type: Web application. Authorized JavaScript origin & Authorized redirect URIs need two addresses each, as explained [here](https://github.com/aalto-trafficsense/regular-routes-client/blob/master/README.markdown#31-build-new-ids-in-google-developer-console).
-    * Copy the returned client_ID to your Android client project. File `regularroutes/src/main/assets/regularroutes.conf`, line web_cl_id.
-    * Use the download link on the OAuth 2.0 client ID to download the client_secrets.json
-    * Copy client_secrets.json to `/opt/regularroutes` on your server
 1. Rectify user rights  
     `cd /out/regularroutes`
     `sudo chgrp lerero client_secrets.json`  
