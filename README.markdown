@@ -101,7 +101,7 @@ These instructions are for setting up servers over a network connection. Tempora
 1. Setup production server (run default recipe in local mode)  
     `sudo chef-client --local-mode -j ../regularroutes-srvr.json`
 1. Rectify user rights  
-    `cd /out/regularroutes`
+    `cd /opt/regularroutes`
     `sudo chgrp lerero client_secrets.json`  
     `sudo chmod 0640 client_secrets.json`  
 1. Start the server  
