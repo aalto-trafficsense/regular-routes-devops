@@ -53,6 +53,7 @@ These instructions are for setting up servers over a network connection. Tempora
         * `Authorized redirect URIs` should fill in automatically.
         * Press "Create"
         * Select the generated Web client ID (default "Web client 1") and download a JSON-version of the _client secret_ by pressing "Download JSON" and saving the file as "client_secrets.json" to `/opt/regularroutes` on your server 
+        * Copy the "Client ID" (looks like "7948743243-hsuefse3hisefssef.apps.googleuser...") to your regular-routes-client project; file `regularroutes/src/main/assets/regularroutes.conf`, line `web_cl_id`.
      * 2. Browser API key to be used for Google maps access: "API Key"
         * Select "Browser key". The default name will be "Browser key 1"
         * Enter a host name like `my.server.url/*` into the "Accept requests from these HTTP referrers" field
@@ -60,11 +61,10 @@ These instructions are for setting up servers over a network connection. Tempora
         * Copy the "Key" (looks like "AIzaSjs8iSef...") to the "maps_api_key" of your `regularroutes-srvr.json`file, shown below.
      * 3. Android client ID: "OAuth 2.0 client ID" with the following information:
         * Application type: Android
-        * Signing-certificate fingerprint. This comes from the signing key keystore generated earlier.
+        * Signing-certificate fingerprint. This is the SHA1 fingerprint coming from the signing key keystore generated earlier.
         * Package name: From the "AndroidManifest.xml" file in the client: "fi.aalto.trafficsense.regularroutes"
         * Google+ deep linking is not used.
         * Press "Create"
-        * Copy the "Client ID" (looks like "7948743243-hsuefse3hisefssef.apps.googleuser...") to your regular-routes-client project; file `regularroutes/src/main/assets/regularroutes.conf`, line `web_cl_id`.
 1. Generate suitable JSON-files for your next operations. Depending on whether you are populating map data on a temporary server or generating a new server, the format is slightly different.
      * For the purpose of *generating waypoints from a map* (`regularroutes-wpts.json`):
 
