@@ -39,7 +39,7 @@ These instructions are for setting up servers over a network connection. Tempora
 1. Unzip the cookbook package `tar xfz cookbooks-1432555542.tar.gz`
 1. [A signing key](https://developer.android.com/tools/publishing/app-signing.html) must be available. If you don't have one yet, manual generation (typically locally) can be done with:
         `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 `
-        _A password for the keystore and a key password are needed - remember or write down!_
+        _A password for the keystore and a key password are needed - remember or write down!_ Alternatively it is possible to use the debug key, normally found in `~/.android/debug.keystore`
 1. Generate the necessary keys on the [Google developer console](https://console.developers.google.com)
      * If no project available: Set up a new project
      * Fill in the "Product name" field (to be shown to users at login-time) on "APIs & auth" / "Credentials" / "OAuth consent screen"
