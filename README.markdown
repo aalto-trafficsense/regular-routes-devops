@@ -61,7 +61,7 @@ These instructions are for setting up servers over a network connection. Tempora
         * Copy the "Key" (looks like "AIzaSjs8iSef...") to the "maps_api_key" of your `regularroutes-srvr.json`file, shown below.
      * 3. Android client ID: "OAuth 2.0 client ID" with the following information:
         * Application type: Android
-        * Signing-certificate fingerprint. This is the SHA1 fingerprint coming from the signing key keystore generated earlier.
+        * Signing-certificate fingerprint. This is the SHA1 fingerprint coming from the signing key keystore generated earlier. The Google developer console has instructions for obtaining the SHA1, like this: `keytool -exportcert -alias androiddebugkey -keystore path-to-debug-or-production-keystore -list -v`
         * Package name: From the "AndroidManifest.xml" file in the client: "fi.aalto.trafficsense.regularroutes"
         * Google+ deep linking is not used.
         * Press "Create"
