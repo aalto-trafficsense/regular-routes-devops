@@ -102,9 +102,9 @@ These instructions are for setting up servers over a network connection. Tempora
     * Restore the database: `pg_restore -h 127.0.0.1 -U regularroutes -W -d regularroutes my_database.dump`
     * _Another way with text-format dump to be tested_
     * _Note: If a separate server was used just for database population, it is no longer needed after this step._
-1. Setup production server (run default recipe in local mode)  
+1. Setup and start the production server (run default recipe in local mode)  
     `sudo chef-client --local-mode -j ../regularroutes-srvr.json`
-1. Start the server  
+1. To re-start the server, if needed
     `sudo restart regularroutes`  
 
 Logs will be in `/var/log/upstart/`
