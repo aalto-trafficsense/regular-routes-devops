@@ -85,9 +85,9 @@ These instructions are for setting up servers over a network connection. Tempora
     }```
 
 1. Generate waypoints (run osm recipe in local mode)  
-        `cd /opt/regularroutes-cookbooks/cookbooks`
-        `sudo chef-client --local-mode -j ../regularroutes-wpts.json`  
-        _Note: Does not work on Ubuntu 12.04, requires v. 14 or higher. Also memory-hungry. May fail if the server doesn't have enough memory._
+    * `$ cd /opt/regularroutes-cookbooks/cookbooks`
+    * `$ sudo chef-client --local-mode -j ../regularroutes-wpts.json`  
+    * _Note: Does not work on Ubuntu 12.04, requires v. 14 or higher. Also memory-hungry. May fail if the server doesn't have enough memory._
 1. *IF* waypoint generation was done on another server than the intended production server, package and transfer the resulting osm database to the production server:
     * `pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t > my_database.dump`
     * _TBD: Whether pg_dumpall would be better?_
@@ -98,8 +98,8 @@ These instructions are for setting up servers over a network connection. Tempora
     * _Another way with text-format dump to be tested_
     * _Note: If a separate server was used just for database population, it is no longer needed after this step._
 1. Setup and start the production server (run default recipe in local mode)  
-        `cd /opt/regularroutes-cookbooks/cookbooks`
-        `sudo chef-client --local-mode -j ../regularroutes-srvr.json`
+    * `$ cd /opt/regularroutes-cookbooks/cookbooks`
+    * `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json`
 1. To re-start the server, if needed
         `sudo restart regularroutes`  
 
