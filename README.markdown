@@ -34,17 +34,17 @@ These instructions are for setting up servers over a network connection. Tempora
         `scp cookbooks-1432555542.tar.gz user@host:.`
 1. Login to your server (e.g. with SSH)
 1. [Install Chef client](https://wwan w.chef.io/download-chef-client/):  
-        `curl -L https://www.chef.io/chef/install.sh | sudo bash`  
+        `curl -L https://www.chef.io/chef/install.sh | sudo bash`
+        Sample location `/opt/chef/` is assumed.
 1. Update packages by running `sudo apt-get update`
-1. Unzip the cookbook package `tar xfz cookbooks-1432555542.tar.gz`
-1. [A signing key](https://developer.android.com/tools/publishing/app-signing.html) must be available. If you don't have one yet, manual generation (typically locally) can be done with:
-        `$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 `
-        _A password for the keystore and a key password are needed - remember or write down!_ Alternatively it is possible to use the debug key, normally found in `~/.android/debug.keystore`
+1. Unzip the cookbook package 
+        `tar xfz cookbooks-1432555542.tar.gz`
+        Sample location `/opt/regularroutes-cookbooks/cookbooks..`is assumed.
 1. Generate the necessary keys on the [Google developer console](https://console.developers.google.com)
      * If no project available: Set up a new project
      * Fill in the "Product name" field (to be shown to users at login-time) on "APIs & auth" / "Credentials" / "OAuth consent screen"
      * Enable "Google Maps JavaScript API" under "APIs & Auth" / "APIs"
-     * Generate three credentials under "APIs & Auth" / "Credentials" / "Credentials": "Add credentials" as follows
+     * Generate two credentials under "APIs & Auth" / "Credentials" / "Credentials": "Add credentials" as follows
      * 1. OAuth web client ID, which the server will use towards Google APIs: "OAuth 2.0 client ID" with the following information:
         * Application type: Web application.
         * `Authorized JavaScript origins`
@@ -54,31 +54,25 @@ These instructions are for setting up servers over a network connection. Tempora
         * Press "Create"
         * Select the generated Web client ID (default "Web client 1") and download a JSON-version of the _client secret_ by pressing "Download JSON" and saving the file as "client_secrets.json" to `/opt/regularroutes` on your server 
         * Set correct access privileges:
-          `cd /opt/regularroutes`
           `sudo chgrp lerero client_secrets.json`  
           `sudo chmod 0640 client_secrets.json`  
-        * Copy the "Client ID" (looks like "7948743243-hsuefse3hisefssef.apps.googleuser...") to your regular-routes-client project; file `regularroutes/src/main/assets/regularroutes.conf`, line `web_cl_id`.
+        * _Note: the "Client ID" (looks like "7948743243-hsuefse3hisefssef.apps.googleuser...") is also needed for building a [regular-routes-client](https://github.com/aalto-trafficsense/regular-routes-client). If building a corresponding client, the ID can be copied now._
      * 2. Browser API key to be used for Google maps access: "API Key"
         * Select "Browser key". The default name will be "Browser key 1"
         * Enter a host name like `my.server.url/*` into the "Accept requests from these HTTP referrers" field
         * Press "Create"
         * Copy the "Key" (looks like "AIzaSjs8iSef...") for inclusion to the "maps_api_key" of your `regularroutes-srvr.json`file, to be generated in the following steps.
-     * 3. Android client ID: "OAuth 2.0 client ID" with the following information:
-        * Application type: Android
-        * Signing-certificate fingerprint. This is the SHA1 fingerprint coming from the signing key keystore generated earlier. The Google developer console has instructions for obtaining the SHA1, like this: `keytool -exportcert -alias androiddebugkey -keystore path-to-debug-or-production-keystore -list -v`
-        * Package name: From the "AndroidManifest.xml" file in the client: "fi.aalto.trafficsense.regularroutes"
-        * Google+ deep linking is not used.
-        * Press "Create"
-1. Generate suitable JSON-files for your next operations. Also check that chef will have access to them, ref the `chgrp` and `chmod` settings above. Depending on whether you are populating map data on a temporary server or generating a new server, the format is slightly different.
+     * _Note: A third credential is needed for the [client](https://github.com/aalto-trafficsense/regular-routes-client). If configuring both, it is practical to generate it now._
+1. Generate suitable JSON-files for your next operations. Sample location `/opt/regularroutes-cookbooks/` is assumed. Also check that chef will have access to them, ref the `chgrp` and `chmod` settings for `client_secrets.json` above. Depending on whether you are populating map data on a temporary server or generating a new server, the format is slightly different.
      * For the purpose of *generating waypoints from a map* (`regularroutes-wpts.json`):
 
     ```{  
-      "regularroutes": {  
-        "db_password": "<generate for the database>",  
-        "osm_url": "http://download.geofabrik.de/europe/finland-latest.osm.pbf"  
-      },  
-      "run_list": ["recipe[regularroutes::osm]"]  
-    }  ```
+        "regularroutes": {  
+          "db_password": "<generate for the database>",  
+          "osm_url": "http://download.geofabrik.de/europe/finland-latest.osm.pbf"  
+        },  
+        "run_list": ["recipe[regularroutes::osm]"]  
+    }``` 
     
      * For a *production server* (`regularroutes-srvr.json`):
 
@@ -87,13 +81,14 @@ These instructions are for setting up servers over a network connection. Tempora
           "maps_api_key" : "<created in Google console>",  
           "db_password": "<generate for the database>"  
         },  
-      "run_list": ["recipe[regularroutes]"]  
+        "run_list": ["recipe[regularroutes]"]  
     }```
 
 1. Generate waypoints (run osm recipe in local mode)  
-        `sudo chef-client --local-mode -j ../regularroutes-wpts.json`  
-        _Note: Does not work on Ubuntu 12.04, requires v. 14 or higher. Also memory-hungry. May fail if the server doesn't have enough memory._
-1. *IF* population was done on another server than the intended production server, package and transfer the resulting osm database to the production server:
+    `cd /opt/regularroutes-cookbooks/cookbooks`
+    `sudo chef-client --local-mode -j ../regularroutes-wpts.json`  
+    _Note: Does not work on Ubuntu 12.04, requires v. 14 or higher. Also memory-hungry. May fail if the server doesn't have enough memory._
+1. *IF* waypoint generation was done on another server than the intended production server, package and transfer the resulting osm database to the production server:
     * `pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t > my_database.dump`
     * _TBD: Whether pg_dumpall would be better?_
     * Pack: `gzip my_database.dump`
@@ -103,6 +98,7 @@ These instructions are for setting up servers over a network connection. Tempora
     * _Another way with text-format dump to be tested_
     * _Note: If a separate server was used just for database population, it is no longer needed after this step._
 1. Setup and start the production server (run default recipe in local mode)  
+    `cd /opt/regularroutes-cookbooks/cookbooks`
     `sudo chef-client --local-mode -j ../regularroutes-srvr.json`
 1. To re-start the server, if needed
     `sudo restart regularroutes`  
