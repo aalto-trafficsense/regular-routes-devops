@@ -28,18 +28,18 @@ These instructions are for setting up servers over a network connection. Tempora
 1. Package cookbooks in your *local development environment* (automatically resolves and includes dependencies):
         `cd regular-routes-devops`  
         `berks package`  
-        --> creates a file named something like `cookbooks-1432555542.tar.gz`
-        _Alternative: `berks vendor <path>`creates the files directly to <path>. One good path is `..` But BEWARE, this may cleanup your whole directory structure._
+      * --> creates a file named something like `cookbooks-1432555542.tar.gz`
+      * _Alternative: `berks vendor <path>`creates the files directly to <path>. One good path is `..` But BEWARE, this may cleanup your whole directory structure._
 1. Copy the newly generated cookbook package from your local workstation to the target server  
         `scp cookbooks-1432555542.tar.gz user@host:.`
 1. Login to your server (e.g. with SSH)
 1. [Install Chef client](https://wwan w.chef.io/download-chef-client/):  
         `curl -L https://www.chef.io/chef/install.sh | sudo bash`
-        Sample location `/opt/chef/` is assumed.
+      * Sample location `/opt/chef/` is assumed.
 1. Update packages by running `sudo apt-get update`
 1. Unzip the cookbook package 
         `tar xfz cookbooks-1432555542.tar.gz`
-        Sample location `/opt/regularroutes-cookbooks/cookbooks..`is assumed.
+      * Sample location `/opt/regularroutes-cookbooks/cookbooks..`is assumed.
 1. Generate the necessary keys on the [Google developer console](https://console.developers.google.com)
      * If no project available: Set up a new project
      * Fill in the "Product name" field (to be shown to users at login-time) on "APIs & auth" / "Credentials" / "OAuth consent screen"
@@ -54,8 +54,8 @@ These instructions are for setting up servers over a network connection. Tempora
         * Press "Create"
         * Select the generated Web client ID (default "Web client 1") and download a JSON-version of the _client secret_ by pressing "Download JSON" and saving the file as "client_secrets.json" to `/opt/regularroutes` on your server 
         * Set correct access privileges:
-          `sudo chgrp lerero client_secrets.json`  
-          `sudo chmod 0640 client_secrets.json`  
+        `sudo chgrp lerero client_secrets.json`  
+        `sudo chmod 0640 client_secrets.json`  
         * _Note: the "Client ID" (looks like "7948743243-hsuefse3hisefssef.apps.googleuser...") is also needed for building a [regular-routes-client](https://github.com/aalto-trafficsense/regular-routes-client). If building a corresponding client, the ID can be copied now._
      * 2. Browser API key to be used for Google maps access: "API Key"
         * Select "Browser key". The default name will be "Browser key 1"
@@ -66,28 +66,28 @@ These instructions are for setting up servers over a network connection. Tempora
 1. Generate suitable JSON-files for your next operations. Sample location `/opt/regularroutes-cookbooks/` is assumed. Also check that chef will have access to them, ref the `chgrp` and `chmod` settings for `client_secrets.json` above. Depending on whether you are populating map data on a temporary server or generating a new server, the format is slightly different.
      * For the purpose of *generating waypoints from a map* (`regularroutes-wpts.json`):
 
-    ```{  
-        "regularroutes": {  
-          "db_password": "<generate for the database>",  
-          "osm_url": "http://download.geofabrik.de/europe/finland-latest.osm.pbf"  
-        },  
-        "run_list": ["recipe[regularroutes::osm]"]  
-    }``` 
+        ```{
+           "regularroutes": {  
+             "db_password": "<generate for the database>",  
+             "osm_url": "http://download.geofabrik.de/europe/finland-latest.osm.pbf"  
+           },  
+          "run_list": ["recipe[regularroutes::osm]"]  
+        }``` 
     
      * For a *production server* (`regularroutes-srvr.json`):
 
-    ```{  
-        "regularroutes": {  
-          "maps_api_key" : "<created in Google console>",  
-          "db_password": "<generate for the database>"  
-        },  
+        ```{  
+           "regularroutes": {  
+              "maps_api_key" : "<created in Google console>",  
+              "db_password": "<generate for the database>"  
+           },  
         "run_list": ["recipe[regularroutes]"]  
     }```
 
 1. Generate waypoints (run osm recipe in local mode)  
-    `cd /opt/regularroutes-cookbooks/cookbooks`
-    `sudo chef-client --local-mode -j ../regularroutes-wpts.json`  
-    _Note: Does not work on Ubuntu 12.04, requires v. 14 or higher. Also memory-hungry. May fail if the server doesn't have enough memory._
+        `cd /opt/regularroutes-cookbooks/cookbooks`
+        `sudo chef-client --local-mode -j ../regularroutes-wpts.json`  
+        _Note: Does not work on Ubuntu 12.04, requires v. 14 or higher. Also memory-hungry. May fail if the server doesn't have enough memory._
 1. *IF* waypoint generation was done on another server than the intended production server, package and transfer the resulting osm database to the production server:
     * `pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t > my_database.dump`
     * _TBD: Whether pg_dumpall would be better?_
@@ -98,10 +98,10 @@ These instructions are for setting up servers over a network connection. Tempora
     * _Another way with text-format dump to be tested_
     * _Note: If a separate server was used just for database population, it is no longer needed after this step._
 1. Setup and start the production server (run default recipe in local mode)  
-    `cd /opt/regularroutes-cookbooks/cookbooks`
-    `sudo chef-client --local-mode -j ../regularroutes-srvr.json`
+        `cd /opt/regularroutes-cookbooks/cookbooks`
+        `sudo chef-client --local-mode -j ../regularroutes-srvr.json`
 1. To re-start the server, if needed
-    `sudo restart regularroutes`  
+        `sudo restart regularroutes`  
 
 Logs will be in `/var/log/upstart/`
 
@@ -121,7 +121,7 @@ B: Setting up local development server using Virtualbox and Vagrant
 Importing Open Street map data from crossings-repository
 --------------------------------------------------------
 
-TBD: Explain who needs this and for what.
+Method alternative to running the waypoint-generation with the chef-script, as explained above, and only does the first step of importing. MJR: Should this be archived somewhere else as obsolete?
 
 * Remarks 1: Waypoint (crossings) data is in Open Street Map (osm) formatting
 * Remarks 2: This instructions expects you to have vagrant up and running with PostgreSQL (+PostGIS) database service up & running and port forwarding to db service to port 5432 at localhost 
