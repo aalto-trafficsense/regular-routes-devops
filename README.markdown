@@ -79,7 +79,8 @@ These instructions are for setting up servers over a network connection. Tempora
         ```{  
            "regularroutes": {  
               "maps_api_key" : "<created in Google console>",  
-              "db_password": "<generate for the database>"  
+              "db_password": "<generate for the database>",
+              "server_branch": "<github regular-routes-server branch name to install, typically: master"
            },  
         "run_list": ["recipe[regularroutes]"]  
     }```

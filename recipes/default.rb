@@ -24,7 +24,7 @@ end
 
 git '/opt/regularroutes/server' do
   repository 'https://github.com/aalto-trafficsense/regular-routes-server'
-  revision 'master'
+  revision node[:regularroutes][:server_branch]
   action :sync
 end
 
