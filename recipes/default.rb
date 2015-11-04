@@ -25,7 +25,12 @@ end
 git '/opt/regularroutes/server' do
   repository 'https://github.com/aalto-trafficsense/regular-routes-server'
   revision node[:regularroutes][:server_branch]
+  action :checkout
   action :sync
+end
+
+execute 'cp favicon.ico /var/www/html/' do
+  cwd '/opt/regularroutes/server/static/icon'
 end
 
 python_virtualenv '/opt/regularroutes/virtualenv' do
@@ -56,14 +61,14 @@ nginx_site "regularroutes.conf"
 cron 'curl_duplicates' do
   hour '1'
   minute '0'
-  command 'curl -s http://localhost/api/maintenance/duplicates'
+  command 'curl -s http://127.0.0.1/api/maintenance/duplicates'
   user 'lerero'
 end
 
 cron 'curl_snapping' do
   hour '2'
   minute '0'
-  command 'curl -s http://localhost/api/maintenance/snapping'
+  command 'curl -s http://127.0.0.1/api/maintenance/snapping'
   user 'lerero'
 end
 
