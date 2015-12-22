@@ -1,9 +1,36 @@
-cookbook_file "/etc/init/regularroutes.conf" do
-  source "upstart.conf"
+cookbook_file "/etc/init/regularroutes-api.conf" do
+  source "upstart-api.conf"
   mode "0644"
 end
 
-service "regularroutes" do
+cookbook_file "/etc/init/regularroutes-site.conf" do
+  source "upstart-site.conf"
+  mode "0644"
+end
+
+cookbook_file "/etc/init/regularroutes-dev.conf" do
+  source "upstart-dev.conf"
+  mode "0644"
+end
+
+cookbook_file "/etc/init/regularroutes-scheduler.conf" do
+  source "upstart-scheduler.conf"
+  mode "0644"
+end
+
+service "regularroutes-api" do
+  action :stop
+end
+
+service "regularroutes-site" do
+  action :stop
+end
+
+service "regularroutes-dev" do
+  action :stop
+end
+
+service "regularroutes-scheduler" do
   action :stop
 end
 
@@ -72,6 +99,18 @@ cron 'curl_snapping' do
   user 'lerero'
 end
 
-service "regularroutes" do
+service "regularroutes-api" do
+  action [:restart, :enable]
+end
+
+service "regularroutes-site" do
+  action [:restart, :enable]
+end
+
+service "regularroutes-dev" do
+  action [:restart, :enable]
+end
+
+service "regularroutes-scheduler" do
   action [:restart, :enable]
 end
