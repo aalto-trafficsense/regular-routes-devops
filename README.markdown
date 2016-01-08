@@ -101,8 +101,10 @@ These instructions are for setting up servers over a network connection. Tempora
 1. Setup and start the production server (run default recipe in local mode)  
     * `$ cd /opt/regularroutes-cookbooks/cookbooks`
     * `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json`
-1. To re-start the server, if needed
-        `sudo restart regularroutes`  
+1. If needed, individual services can be stopped, started and re-started with
+    * `sudo restart regularroutes-api`
+    * `restart` can be replaced with `stop`, `start` etc.
+    * `regularroutes-api` can be replaced with `regularroutes-site`, `regularroutes-dev` or `regularroutes-scheduler`. The functions of the different components are described in the [regular-routes-server readme](https://github.com/aalto-trafficsense/regular-routes-server/blob/master/README.md).
 
 Logs will be in `/var/log/upstart/`
 
