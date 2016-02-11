@@ -58,12 +58,12 @@ These instructions are for setting up servers over a network connection. Tempora
         `sudo chgrp lerero client_secrets.json`  
         `sudo chmod 0640 client_secrets.json`  
         * _Note: the "Client ID" (looks like "7948743243-hsuefse3hisefssef.apps.googleuser...") is also needed for building a [regular-routes-client](https://github.com/aalto-trafficsense/regular-routes-client). If building a corresponding client, the ID can be copied now._
-     * 2. Browser API key to be used for Google maps access: "API Key"
+     * 2. Browser API key to be used for Google maps access through the server: "API Key"
         * Select "Browser key". The default name will be "Browser key 1"
         * Enter a host name like `my.server.url/*` into the "Accept requests from these HTTP referrers" field
         * Press "Create"
         * Copy the "Key" (looks like "AIzaSjs8iSef...") for inclusion to the "maps_api_key" of your `regularroutes-srvr.json`file, to be generated in the following steps.
-     * _Note: A third credential is needed for the [client](https://github.com/aalto-trafficsense/regular-routes-client). If configuring both, it is practical to generate it now._
+     * _Note: A third credential and another API are needed for the [client](https://github.com/aalto-trafficsense/regular-routes-client). If configuring both, it is practical to generate/enable them now._
 1. Generate suitable JSON-files for your next operations. Sample location `/opt/regularroutes-cookbooks/` is assumed. Also check that chef will have access to them, ref the `chgrp` and `chmod` settings for `client_secrets.json` above. Depending on whether you are populating map data on a temporary server or generating a new server, the format is slightly different.
      * For the purpose of *generating waypoints from a map* (`regularroutes-wpts.json`):
 
