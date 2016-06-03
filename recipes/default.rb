@@ -26,9 +26,10 @@ service "regularroutes-site" do
   action :stop
 end
 
-service "regularroutes-dev" do
-  action :stop
-end
+# MJR: Commenting out 3.6.2016 as the dev interface must not be available on production servers, so it should not be running in the first place
+# service "regularroutes-dev" do
+#   action :stop
+# end
 
 service "regularroutes-scheduler" do
   action :stop
@@ -56,9 +57,10 @@ git '/opt/regularroutes/server' do
   action :sync
 end
 
-execute 'cp favicon.ico /var/www/html/' do
-  cwd '/opt/regularroutes/server/static/icon'
-end
+# MJR commented out 3.6.2016: Current html picks the favicon from static/icon
+# execute 'cp favicon.ico /var/www/html/' do
+#   cwd '/opt/regularroutes/server/static/icon'
+# end
 
 python_virtualenv '/opt/regularroutes/virtualenv' do
   owner 'root'
@@ -107,9 +109,10 @@ service "regularroutes-site" do
   action [:restart, :enable]
 end
 
-service "regularroutes-dev" do
-  action [:restart, :enable]
-end
+# MJR: Commenting out 3.6.2016 as the dev interface must not be available on production servers
+# service "regularroutes-dev" do
+#   action [:restart, :enable]
+# end
 
 service "regularroutes-scheduler" do
   action [:restart, :enable]
