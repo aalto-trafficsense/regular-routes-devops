@@ -1,5 +1,11 @@
 SECRET_KEY = 'secretkey'
 SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://regularroutes:<%= node[:regularroutes][:db_password] %>@localhost/regularroutes'
 MAPS_API_KEY = '<%= node[:regularroutes][:maps_api_key] %>'
+FMI_API_KEY = '<%= node[:regularroutes][:fmi_api_key] %>'
 RR_URL_PREFIX = ''
 AUTH_REDIRECT_URI = 'urn:ietf:wg:oauth:2.0:oob'
+MASS_TRANSIT_LIVE_KEEP_DAYS = <%= node[:regularroutes][:mass_transit_live_keep_days] %>
+GMAIL_FROM = '<%= node[:regularroutes][:gmail_from] %>'
+GMAIL_PWD = '<%= node[:regularroutes][:gmail_pwd] %>'
+EMAIL_TO = '<%= node[:regularroutes][:email_to] %>'
+

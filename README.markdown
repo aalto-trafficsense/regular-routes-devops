@@ -79,8 +79,13 @@ These instructions are for setting up servers over a network connection. Tempora
 
         ```{  
            "regularroutes": {  
-              "maps_api_key" : "<created in Google console>",  
               "db_password": "<generate for the database>",
+              "maps_api_key" : "<created in Google console>",
+              "fmi_api_key" : "<request from the [Finnish Meteorological Institute](https://en.ilmatieteenlaitos.fi/open-data)>",  
+              "mass_transit_live_keep_days" : "<days to store mass transit data obtained from Helsinki Regional Traffic>",  
+              "gmail_from" : "<a gmail account the server sends email from (currently in the case a user presses the cancel participation button)>",
+              "gmail_pwd" : "<the password for the above gmail account>",
+              "email_to" : "<the email address where mail from the above address is sent>",
               "server_branch": "<github regular-routes-server branch name to install, typically: master"
            },  
         "run_list": ["recipe[regularroutes]"]  
