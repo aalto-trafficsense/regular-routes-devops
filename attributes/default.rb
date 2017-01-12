@@ -1,6 +1,7 @@
 default['regularroutes']['db_password'] = '';
 default['regularroutes']['maps_api_key'] = '';
 default['regularroutes']['fmi_api_key'] = '';
+default['regularroutes']['firebase_key'] = '';
 default['regularroutes']['mass_transit_live_keep_days'] = '7';
 default['regularroutes']['gmail_from'] = '';
 default['regularroutes']['gmail_pwd'] = '';
