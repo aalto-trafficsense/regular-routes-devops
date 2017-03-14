@@ -79,7 +79,8 @@ These instructions are for setting up servers over a network connection. Tempora
              "osm_url": "http://download.geofabrik.de/europe/finland-latest.osm.pbf"  
            },  
           "run_list": ["recipe[regularroutes::osm]"]  
-        }``` 
+        }
+        ``` 
     
      * For a *production server* (`regularroutes-srvr.json`):
 
@@ -95,10 +96,11 @@ These instructions are for setting up servers over a network connection. Tempora
               "email_to" : "<the email address where mail from the above address is sent>",
               "reverse_geocoding_uri_template" : "<url to pelias instance>",
               "reverse_geocoding_queries_per_second" : "<integer limit>",
-              "server_branch": "<github regular-routes-server branch name to install, typically: master"
+              "server_branch": "<github regular-routes-server branch name to install, typically: master>"
            },  
         "run_list": ["recipe[regularroutes]"]  
-    }```
+        }
+        ```
 
 1. Generate waypoints (run osm recipe in local mode)  
     * `$ cd /opt/regularroutes-cookbooks/cookbooks`
