@@ -91,7 +91,7 @@ These instructions are for setting up servers over a network connection. Tempora
               "db_password": "<generate for the database>",
               "maps_api_key" : "<created in Google console>",
               "fmi_api_key" : "<request from the [Finnish Meteorological Institute](https://en.ilmatieteenlaitos.fi/open-data)>",
-	      "firebase_key" : "<[Firebase console](https://console.firebase.google.com/) Settings -> Project Settings -> Cloud messaging -> Project Credentials -> Server key>",
+              "firebase_key" : "<[Firebase console](https://console.firebase.google.com/) Settings -> Project Settings -> Cloud messaging -> Project Credentials -> Server key>",
               "mass_transit_live_keep_days" : "<days to store mass transit data obtained from Helsinki Regional Traffic>",  
               "gmail_from" : "<a gmail account the server sends email from (currently in the case a user presses the cancel participation button)>",
               "gmail_pwd" : "<the password for the above gmail account>",
