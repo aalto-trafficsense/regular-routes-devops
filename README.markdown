@@ -74,7 +74,7 @@ These instructions are for setting up servers over a network connection. Tempora
      * For the purpose of *generating waypoints from a map* (`regularroutes-wpts.json`):
 
         ```
-	{
+	   {
            "regularroutes": {  
              "db_password": "<generate for the database>",  
              "osm_url": "http://download.geofabrik.de/europe/finland-latest.osm.pbf"  
@@ -86,7 +86,7 @@ These instructions are for setting up servers over a network connection. Tempora
      * For a *production server* (`regularroutes-srvr.json`):
 
         ```
-	{  
+	   {
            "regularroutes": {  
               "db_password": "<generate for the database>",
               "maps_api_key" : "<created in Google console>",
@@ -100,7 +100,7 @@ These instructions are for setting up servers over a network connection. Tempora
               "reverse_geocoding_queries_per_second" : "<integer limit>",
               "server_branch": "<github regular-routes-server branch name to install, typically: master>"
            },  
-        "run_list": ["recipe[regularroutes]"]  
+           "run_list": ["recipe[regularroutes]"]  
         }
         ```
 
