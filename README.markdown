@@ -54,7 +54,9 @@ These instructions are for setting up servers over a network connection. Tempora
         * `Authorized redirect URIs` should fill in automatically.
         * Press "Create"
         * Select the generated Web client ID (default "Web client 1") and download a JSON-version of the _client secret_ by pressing "Download JSON" and saving the file as "client_secrets.json" to `/opt/regularroutes` on your server 
-        * Set correct access privileges:
+        * Create group "lerero":
+        `sudo adduser --system --group lerero`  
+        * Set correct access privileges:
         `sudo chgrp lerero client_secrets.json`  
         `sudo chmod 0640 client_secrets.json`  
         * _Note: the "Client ID" (looks like "7948743243-hsuefse3hisefssef.apps.googleuser...") is also needed for building a [regular-routes-client](https://github.com/aalto-trafficsense/regular-routes-client). If building a corresponding client, the ID can be copied now._
