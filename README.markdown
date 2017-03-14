@@ -37,7 +37,7 @@ These instructions are for setting up servers over a network connection. Tempora
         `curl -L https://www.chef.io/chef/install.sh | sudo bash`
       * Sample location `/opt/chef/` is assumed.
 1. Update packages by running `sudo apt-get update`.
-1. The scientific python libraries (used in prediction) will also need (this set works, but something may not be necessary) `sudo apt-get install build-essential python-pip python-dev gfortran libatlas-base-dev libblas-dev liblapack-dev` (chef scripts will not get through python requirements without these)
+1. The scientific python libraries (used in prediction) will also need (this set works, but something may not be necessary) `sudo apt-get install build-essential python-pip python-dev gfortran libatlas-base-dev libblas-dev liblapack-dev libssl-dev` (chef scripts will not get through python requirements without these)
 1. Unzip the cookbook package 
         `tar xfz cookbooks-1432555542.tar.gz`
       * Sample location `/opt/regularroutes-cookbooks/cookbooks/`is assumed.
