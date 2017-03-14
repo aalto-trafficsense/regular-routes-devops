@@ -73,7 +73,8 @@ These instructions are for setting up servers over a network connection. Tempora
 1. Generate suitable JSON-files for your next operations. Sample location `/opt/regularroutes-cookbooks/` is assumed. Also check that chef will have access to them, ref the `chgrp` and `chmod` settings for `client_secrets.json` above. Depending on whether you are populating map data on a temporary server or generating a new server, the format is slightly different.
      * For the purpose of *generating waypoints from a map* (`regularroutes-wpts.json`):
 
-        ```{
+        ```
+	{
            "regularroutes": {  
              "db_password": "<generate for the database>",  
              "osm_url": "http://download.geofabrik.de/europe/finland-latest.osm.pbf"  
@@ -84,7 +85,8 @@ These instructions are for setting up servers over a network connection. Tempora
     
      * For a *production server* (`regularroutes-srvr.json`):
 
-        ```{  
+        ```
+	{  
            "regularroutes": {  
               "db_password": "<generate for the database>",
               "maps_api_key" : "<created in Google console>",
