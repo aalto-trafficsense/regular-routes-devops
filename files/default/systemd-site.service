@@ -1,0 +1,11 @@
+[Unit]
+Description=Regularroutes site
+
+[Service]
+Environment=REGULARROUTES_SETTINGS=/opt/regularroutes/regularroutes.cfg
+ExecStart=/opt/regularroutes/virtualenv/bin/gunicorn --bind 127.0.0.1:5001 -t 60 -w 1 siteserver:app
+User=lerero
+WorkingDirectory=/opt/regularroutes/server
+
+[Install]
+WantedBy=multi-user.target

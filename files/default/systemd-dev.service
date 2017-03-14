@@ -1,0 +1,14 @@
+# MJR: Commenting out 3.6.2016, as the dev-interface must not be available on production servers.
+#      Remove the comments and start the service if you are *really* sure about what you are doing.
+#
+#[Unit]
+#Description=Regularroutes dev
+#
+#[Service]
+#Environment=REGULARROUTES_SETTINGS=/opt/regularroutes/regularroutes.cfg
+#ExecStart=/opt/regularroutes/virtualenv/bin/gunicorn --bind 127.0.0.1:5002 -t 60 -w 1 devserver:app
+#User=lerero
+#WorkingDirectory=/opt/regularroutes/server
+#
+#[Install]
+#WantedBy=multi-user.target
