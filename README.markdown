@@ -40,7 +40,7 @@ These instructions are for setting up servers over a network connection. Tempora
 1. The scientific python libraries (used in prediction) will also need (this set works, but something may not be necessary) `sudo apt-get install build-essential python-pip python-dev gfortran libatlas-base-dev libblas-dev liblapack-dev` (chef scripts will not get through python requirements without these)
 1. Unzip the cookbook package 
         `tar xfz cookbooks-1432555542.tar.gz`
-      * Sample location `/opt/regularroutes-cookbooks/cookbooks..`is assumed.
+      * Sample location `/opt/regularroutes-cookbooks/cookbooks/`is assumed.
 1. Generate the necessary keys on the [Google developer console](https://console.developers.google.com)
      * If no project available: Set up a new project
      * Fill in the "Product name" field (to be shown to users at login-time) on "APIs & auth" / "Credentials" / "OAuth consent screen"
