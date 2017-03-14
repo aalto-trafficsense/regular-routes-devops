@@ -19,22 +19,22 @@ cookbook_file "/etc/init/regularroutes-scheduler.conf" do
 end
 
 cookbook_file "/etc/systemd/system/regularroutes-api.service" do
-  source "systemd-api.conf"
+  source "systemd-api.service"
   mode "0644"
 end
 
 cookbook_file "/etc/systemd/system/regularroutes-site.service" do
-  source "systemd-site.conf"
+  source "systemd-site.service"
   mode "0644"
 end
 
 cookbook_file "/etc/systemd/system/regularroutes-dev.service" do
-  source "systemd-dev.conf"
+  source "systemd-dev.service"
   mode "0644"
 end
 
 cookbook_file "/etc/systemd/system/regularroutes-scheduler.service" do
-  source "systemd-scheduler.conf"
+  source "systemd-scheduler.service"
   mode "0644"
 end
 
