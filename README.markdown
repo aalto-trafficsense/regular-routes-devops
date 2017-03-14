@@ -33,7 +33,7 @@ These instructions are for setting up servers over a network connection. Tempora
 1. Copy the newly generated cookbook package from your local workstation to the target server  
         `scp cookbooks-1432555542.tar.gz user@host:.`
 1. Login to your server (e.g. with SSH)
-1. [Install Chef client](https://wwan w.chef.io/download-chef-client/):  
+1. [Install Chef client](https://www.chef.io/download-chef-client/):  
         `curl -L https://www.chef.io/chef/install.sh | sudo bash`
       * Sample location `/opt/chef/` is assumed.
 1. Update packages by running `sudo apt-get update`.
