@@ -9,3 +9,5 @@ default['regularroutes']['email_to'] = '';
 default['regularroutes']['server_branch'] = 'master';
 default['regularroutes']['osm_url'] = 'http://download.geofabrik.de/europe/finland-latest.osm.pbf'
 default['postgis']['version'] = "2.2"
+default['regularroutes']['reverse_geocoding_uri_template'] = '';
+default['regularroutes']['reverse_geocoding_queries_per_second'] = '';
