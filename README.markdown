@@ -125,7 +125,7 @@ These instructions are for setting up servers over a network connection. Tempora
     * `restart` can be replaced with `stop`, `start` etc.
     * `regularroutes-api` can be replaced with `regularroutes-site`, `regularroutes-dev` or `regularroutes-scheduler`. The functions of the different components are described in the [regular-routes-server readme](https://github.com/aalto-trafficsense/regular-routes-server/blob/master/README.md).
 
-Logs will be in `/var/log/upstart/` (upstart) or `/var/log/syslog` (systemd)
+Logs will be in `/var/log/upstart/` (upstart) or `journalctl --unit regularroutes-api` and similar (systemd)
 
 B: Setting up local development server using Virtualbox and Vagrant
 ------------------------------------------
