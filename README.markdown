@@ -71,18 +71,12 @@ If you have a set of waypoints from your target area, you may skip to step C.
 1. Generate waypoints (run osm recipe in local mode)  
     * `$ cd /opt/regularroutes-cookbooks/cookbooks`
     * `$ sudo chef-client --local-mode -j ../regularroutes-wpts.json`  
-1. *IF* waypoint generation was done on another server than the intended production server, package and transfer the resulting osm database to the production server:
-    * `$ pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t > my_database.dump`
-    * _TBD: Whether pg_dumpall would be better?_
-    * Pack: `gzip my_database.dump`
-    * Transfer `my_database.dump.gz` to your intended TrafficSense server e.g. with scp.
-    * Unpack: `gunzip my_database.dump.gz`
-    * Restore the database: `pg_restore -h 127.0.0.1 -U regularroutes -W -d regularroutes my_database.dump`
-    * _Another way with text-format dump to be tested_
+1. *IF* waypoint generation was done on another server than the intended production server, package and save the resulting waypoints table:
+    * `$ pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t -t waypoints > my_waypoints.tar`
+    * Pack: `gzip my_waypoints.tar`
+    * Transfer `my_database.dump.gz` to your intended regularroutes server (or at least a temporary safe location) e.g. with scp.
 
-_Note: If a separate server was used just for database population, it is no longer needed after this step._
-
-Logs will be in `/var/log/upstart/` (upstart) or `journalctl --unit regularroutes-api` and similar (systemd)
+_Note: If this was a separate server just for waypoint generation, it is no longer needed after this step._
 
 
 C: Setting up a TrafficSense server
@@ -139,12 +133,18 @@ Set up and start the actual regular-routes (TrafficSense) server.
     * `$ cd /opt/regularroutes-cookbooks/cookbooks`
     * `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json`
     * If the script concludes without fatal errors, the server should be up and running.
-1. If needed, individual services can be stopped, started and re-started with
-    * `sudo restart regularroutes-api` (upstart) or `sudo systemctl restart regularroutes-api` (systemd)
-    * `restart` can be replaced with `stop`, `start` etc.
-    * `regularroutes-api` can be replaced with `regularroutes-site`, `regularroutes-dev` or `regularroutes-scheduler`. The functions of the different components are described in the [regular-routes-server readme](https://github.com/aalto-trafficsense/regular-routes-server/blob/master/README.md).
+1. *IF* waypoint generation was done on another server, restore the information from that database:
+    * Transfer `my_waypoints.tar.gz` to the intended TrafficSense server e.g. with scp.
+    * Unpack: `gunzip my_waypoints.tar.gz`
+    * Restore the database: `pg_restore -h 127.0.0.1 -U regularroutes -W -d regularroutes my_waypoints.tar`
 
-Logs will be in `/var/log/upstart/` (upstart) or `journalctl --unit regularroutes-api` and similar (systemd)
+If needed, individual services can be stopped, started and re-started with
+    * `$ sudo restart regularroutes-api` (upstart) or `$ sudo systemctl restart regularroutes-api` (systemd)
+    * `restart` can be replaced with `stop`, `start` etc.
+    * `regularroutes-api` can be replaced with `regularroutes-site`, `regularroutes-dev` or `regularroutes-scheduler`.
+    * The functions of the different components are described in the [regular-routes-server readme](https://github.com/aalto-trafficsense/regular-routes-server/blob/master/README.md).
+
+Logs will be in `/var/log/upstart/` (upstart) or `$ journalctl --unit regularroutes-api` and similar (systemd)
 
 D: Setting up local development server using Virtualbox and Vagrant
 -------------------------------------------------------------------
