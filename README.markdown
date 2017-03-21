@@ -4,7 +4,7 @@ regular-routes DevOps repository
 These instructions assume the use of [Chef](https://www.chef.io/) for installation. It is also assumed that you have access to:
 
 1. A local computer.
-1. A server. Temporary servers on e.g. [Digital Ocean](https://www.digitalocean.com/) can be used as fully featured TrafficSense servers for e.g. waypoint generation or client testing.
+1. A server, on which you have owner (root) privileges. Temporary servers on e.g. [Digital Ocean](https://www.digitalocean.com/) can be used as fully featured TrafficSense servers for e.g. waypoint generation or client testing.
 
 A: Cookbook operations
 ----------------------
@@ -35,10 +35,10 @@ On your server:
 1. Login (e.g. with SSH)
 1. Create and cd `regularroutes-cookbooks`:
     * `$ cd /opt`
-    * `$ mkdir regularroutes-cookbooks`
+    * `$ sudo mkdir regularroutes-cookbooks`
     * `$ cd regularroutes-cookbooks`
 1. Unzip the cookbook package in the new directory
-    * `$ tar xfz ~/cookbooks-1432555542.tar.gz`
+    * `$ sudo tar xfz ~/cookbooks-1432555542.tar.gz`
 1. Run a preparation script for initial setup:
     * `$ cookbooks/regularroutes/init.sh`
     *  _Note: Only needed for a new server, not updates._
