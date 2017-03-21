@@ -3,7 +3,6 @@
 # Preparations for a new regular routes server
 # NOT NEEDED for updating an existing server
 
-echo "*****************"
 echo "Updating packages"
 
 sudo apt-get update
@@ -14,6 +13,7 @@ echo "Installing libraries"
 
 sudo apt-get install build-essential python-pip python-dev gfortran libatlas-base-dev libblas-dev liblapack-dev libssl-dev
 
+echo "********************************************************************"
 echo "Installing a chef-client (https://www.chef.io/download-chef-client/)"
 echo "Sample location /opt/chef/ is assumed."
 

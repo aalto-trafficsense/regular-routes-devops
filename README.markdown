@@ -129,6 +129,9 @@ Set up and start the actual regular-routes (TrafficSense) server.
         }
         ```
 
+1. Make sure chef has access to the file:
+    * `$ sudo chgrp lerero regularroutes-srvr.json`
+    * `$ sudo chmod 0640 regularroutes-srvr.json`
 1. Setup and start the production server (run default recipe in local mode)  
     * `$ cd /opt/regularroutes-cookbooks/cookbooks`
     * `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json`
