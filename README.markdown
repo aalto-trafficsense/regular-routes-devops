@@ -72,7 +72,7 @@ If you have a set of waypoints from your target area, you may skip to step C.
     * `$ cd /opt/regularroutes-cookbooks/cookbooks`
     * `$ sudo chef-client --local-mode -j ../regularroutes-wpts.json`  
 1. *IF* waypoint generation was done on another server than the intended production server, package and save the resulting waypoints table:
-    * `$ pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t -t waypoints > my_waypoints.tar`
+    * `$ pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t -t waypoints -t roads -t roads_waypoints > my_waypoints.tar`
     * Pack: `gzip my_waypoints.tar`
     * Transfer `my_database.dump.gz` to your intended regularroutes server (or at least a temporary safe location) e.g. with scp.
 
