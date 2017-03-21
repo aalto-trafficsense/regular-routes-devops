@@ -6,6 +6,7 @@
 #
 #[Service]
 #Environment=REGULARROUTES_SETTINGS=/opt/regularroutes/regularroutes.cfg
+#Environment=PYTHONUNBUFFERED=yes
 #ExecStart=/opt/regularroutes/virtualenv/bin/gunicorn --bind 127.0.0.1:5002 -t 60 -w 1 devserver:app
 #User=lerero
 #WorkingDirectory=/opt/regularroutes/server

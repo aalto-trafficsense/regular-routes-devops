@@ -3,6 +3,7 @@ Description=Regularroutes scheduler
 
 [Service]
 Environment=REGULARROUTES_SETTINGS=/opt/regularroutes/regularroutes.cfg
+Environment=PYTHONUNBUFFERED=yes
 ExecStart=/opt/regularroutes/virtualenv/bin/python scheduler.py
 User=lerero
 WorkingDirectory=/opt/regularroutes/server
