@@ -107,20 +107,6 @@ end
 
 nginx_site "regularroutes.conf"
 
-cron 'curl_duplicates' do
-  hour '1'
-  minute '0'
-  command 'curl -s http://127.0.0.1/api/maintenance/duplicates'
-  user 'lerero'
-end
-
-cron 'curl_snapping' do
-  hour '2'
-  minute '0'
-  command 'curl -s http://127.0.0.1/api/maintenance/snapping'
-  user 'lerero'
-end
-
 service "regularroutes-api" do
   action [:restart, :enable]
 end
