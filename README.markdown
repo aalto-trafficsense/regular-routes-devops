@@ -136,6 +136,7 @@ Set up and start the actual regular-routes (TrafficSense) server.
     * Transfer `my_waypoints.tar.gz` to the intended TrafficSense server e.g. with scp.
     * Unpack: `gunzip my_waypoints.tar.gz`
     * Restore the database: `pg_restore -h 127.0.0.1 -U regularroutes -W -d regularroutes my_waypoints.tar`
+1. To enable HTTPS, configure nginx to use your certificate. See `/etc/nginx/snippets/snakeoil.conf` for an example.
 
 If needed, individual services can be stopped, started and re-started with
     * `$ sudo restart regularroutes-api` (upstart) or `$ sudo systemctl restart regularroutes-api` (systemd)
