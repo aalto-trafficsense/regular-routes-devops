@@ -55,15 +55,13 @@ If you have a set of waypoints from your target area, you may skip to step C.
 
 1. In the `/opt/regularroutes-cookbooks` directory create a json text file called `regularroutes-wpts.json` based on the following template:
 
-        ```
-	   {
+	{
            "regularroutes": {  
              "db_password": "<password: if new install, make up a new one>",  
              "osm_url": "http://download.geofabrik.de/europe/finland-latest.osm.pbf"  
            },  
           "run_list": ["recipe[regularroutes::osm]"]  
         }
-        ``` 
 
 1. Make sure chef has access to the file:
     * `$ sudo chgrp lerero regularroutes-wpts.json`
@@ -74,9 +72,9 @@ If you have a set of waypoints from your target area, you may skip to step C.
 1. *IF* waypoint generation was done on another server than the intended production server, package and save the resulting waypoints table:
     * `$ pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t -t waypoints -t roads -t roads_waypoints > my_waypoints.tar`
     * Pack: `gzip my_waypoints.tar`
-    * Transfer `my_database.dump.gz` to your intended regularroutes server (or at least a temporary safe location) e.g. with scp.
+    * Transfer `my_waypoints.tar.gz` to your intended production server (or at least a temporary safe location) e.g. with scp.
 
-_Note: If this was a separate server just for waypoint generation, it is no longer needed after this step._
+_Note: If this was a temporary server just for waypoint generation, it is no longer needed after this step._
 
 
 C: Setting up a TrafficSense server
@@ -92,8 +90,8 @@ Set up and start the actual regular-routes (TrafficSense) server.
      * 1. OAuth web client ID, which the server will use towards Google APIs: "OAuth 2.0 client ID" with the following information:
         * Application type: Web application.
         * `Authorized JavaScript origins`
-           * http://your.server.url
-           * http://localhost:5000
+           * `http://your.server.url`
+           * `http://localhost:5000`
         * `Authorized redirect URIs` should fill in automatically.
         * Press "Create"
         * Select the generated Web client ID (default "Web client 1") and download a JSON-version of the _client secret_ by pressing "Download JSON" and saving the file as "client_secrets.json" to `/opt/regularroutes` on your server 
@@ -110,8 +108,7 @@ Set up and start the actual regular-routes (TrafficSense) server.
      * The Firebase server key will be needed to generate the JSON-file below
 1. In the `/opt/regularroutes-cookbooks` directory create a json text file called `regularroutes-srvr.json` based on the following template:
 
-        ```
-	   {
+	{
            "regularroutes": {  
               "db_password": "<password; must be same as for B above>",
               "maps_api_key" : "<created in Google console>",
@@ -127,7 +124,6 @@ Set up and start the actual regular-routes (TrafficSense) server.
            },  
            "run_list": ["recipe[regularroutes]"]  
         }
-        ```
 
 1. Make sure chef has access to the file:
     * `$ sudo chgrp lerero regularroutes-srvr.json`
