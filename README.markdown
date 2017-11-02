@@ -25,8 +25,8 @@ On your local machine:
 1. Package the cookbooks (automatically resolves and includes dependencies):
     * `$ cd regular-routes-devops`  
     * `$ berks package`  
-      * --> creates a file named something like `cookbooks-1432555542.tar.gz`
-      * _Alternative: `berks vendor <path>`creates the files directly to <path>. One good path is `..` But BEWARE, this may cleanup your whole directory structure._
+       * --> creates a file named something like `cookbooks-1432555542.tar.gz`
+       * _Alternative: `berks vendor <path>`creates the files directly to <path>. One good path is `..` But BEWARE, this may cleanup your whole directory structure._
 1. Copy the newly generated cookbook package from your local workstation to the target server  
     * `$ scp cookbooks-1432555542.tar.gz user@host:.`
 
@@ -37,6 +37,7 @@ On your server:
     * `$ cd /opt`
     * `$ sudo mkdir regularroutes-cookbooks`
     * `$ cd regularroutes-cookbooks`
+    * _Note: Since these operations are now in a root-owned directory, you may need to enter `$ sudo su` first to have access to the new directory._
 1. Unzip the cookbook package in the new directory
     * `$ sudo tar xfz ~/cookbooks-1432555542.tar.gz`
 1. Run a preparation script for initial setup:
@@ -47,7 +48,7 @@ On your server:
 B: Generating waypoints from OSM
 --------------------------------
 
-Generate a table of waypoints (=crossings) using a map from [OSM](http://www.openstreetmap.org/). The waypoint table has to be present in a running system, but at this time (21.3.2017) no functions depend on the availability of waypoints from a particular area.
+Generate a table of waypoints (=crossings) using a map from [OSM](http://www.openstreetmap.org/). The waypoint table has to be present in a running system, but at this time (2.11.2017) no functions depend on the availability of waypoints from a particular area.
 
 Waypoint generation is the heaviest operation in the process, with > 2 GB memory and minimum Ubuntu v. 14 required. If you have a lightweight server, waypoint generation on a temporary server may be a good idea. On an 8 CPU / 16GB server waypoint generation from Finland took 23 mins.
 
@@ -68,7 +69,8 @@ If you have a set of waypoints from your target area, you may skip to step C.
     * `$ sudo chmod 0640 regularroutes-wpts.json`
 1. Generate waypoints (run osm recipe in local mode)  
     * `$ cd /opt/regularroutes-cookbooks/cookbooks`
-    * `$ sudo chef-client --local-mode -j ../regularroutes-wpts.json`  
+    * `$ sudo chef-client --local-mode -j ../regularroutes-wpts.json`
+    * _Note: The current installation scripts have major issues with Chef v. 13. Check problems and solutions below._
 1. *IF* waypoint generation was done on another server than the intended production server, package and save the resulting waypoints table:
     * `$ pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t -t waypoints -t roads -t roads_waypoints > my_waypoints.tar`
     * Pack: `gzip my_waypoints.tar`
@@ -85,23 +87,23 @@ Set up and start the actual regular-routes (TrafficSense) server.
 1. Generate the necessary keys on the [Google developer console](https://console.developers.google.com)
      * If no project available: Set up a new project
      * Fill in the "Product name" field (to be shown to users at login-time) on "APIs & auth" / "Credentials" / "OAuth consent screen"
-     * Enable "Google Maps JavaScript API" under "APIs & Auth" / "APIs"
-     * Generate two credentials under "APIs & Auth" / "Credentials" / "Credentials": "Add credentials" as follows
+     * Enable "Google Maps JavaScript API" under "APIs & services" / "Dashboard" / "ENABLE APIS AND SERVICES"
+     * Generate two credentials under "APIs & services" / "Credentials" / "Credentials": "Add credentials" as follows
      * 1. OAuth web client ID, which the server will use towards Google APIs: "OAuth 2.0 client ID" with the following information:
         * Application type: Web application.
         * `Authorized JavaScript origins`
-           * `http://your.server.url`
+           * `https://your.server.url` _(http*s* assumes you have a configured SSL certificate, which should be the case)_
            * `http://localhost:5000`
-        * `Authorized redirect URIs` should fill in automatically.
-        * Press "Create"
-        * Select the generated Web client ID (default "Web client 1") and download a JSON-version of the _client secret_ by pressing "Download JSON" and saving the file as "client_secrets.json" to `/opt/regularroutes` on your server 
-        * _Note: the "Client ID" (looks like "7948743243-hsuefse3hisefssef.apps.googleuser...") is also needed for building a [TrafficSense client](https://github.com/aalto-trafficsense/trafficsense-android). If building a corresponding client, the ID can be copied now._
+        * `Authorized redirect URIs` should fill in automatically. If not, enter `https://your.server.url/oauth2callback` and `http://localhost:5000/oauth2callback`
+        * Press "Create"
+        * Select the generated Web client ID (default name "Web client 1") and download a JSON-version of the _client secret_ by pressing "Download JSON" and saving the file as "client_secrets.json" to `/opt/regularroutes` on your server.
+        * _Note: the "Client ID" (looks like "7948743243-hsuefse3hisefssef.apps.googleuser...") is also needed for building a [TrafficSense client](https://github.com/aalto-trafficsense/trafficsense-android) `web_client_id_test` or `web_client_id_production`. If building a corresponding client, copy and save the ID now._
      * 2. Browser API key to be used for Google maps access through the server: "API Key"
         * Select "Browser key". The default name will be "Browser key 1"
-        * Enter a host name like `my.server.url/*` into the "Accept requests from these HTTP referrers" field
+        * Enter host names `your.server.url/*` (and `http://localhost:5000` for local development) into the "Accept requests from these HTTP referrers" field
         * Press "Create"
-        * Copy the "Key" (looks like "AIzaSjs8iSef...") for inclusion to the "maps_api_key" of your `regularroutes-srvr.json`file, to be generated in the following steps.
-     * _Note: A third credential and another API are needed for the [client](https://github.com/aalto-trafficsense/trafficsense-android). If configuring both, it is practical to generate/enable them now._
+        * Copy the "Key" (looks like "AIzaSjs8iSef...") for inclusion to the "maps_api_key" of your `regularroutes-srvr.json` file, to be generated in the following steps.
+     * _Note: A third credential and another API are needed for the [client](https://github.com/aalto-trafficsense/trafficsense-android). If configuring both a server and a client, it is practical to generate/enable them now when the developer console is open._
 1. For labeling places using reverse geocoding, configure the "reverse_geocoding_uri_template" URL (e.g. `https://search.mapzen.com/v1/reverse?api_key=API_KEY&sources=osm&size=20&point.lat={lat}&point.lon={lon}` with your APIKEY substituted) and "reverse_geocoding_queries_per_second" limit in the `regularroutes-srvr.json` file.
 1. For push messaging to clients through Firebase, import your Google developer console project into [Firebase](https://console.firebase.google.com/)
      * The `google-services.json` file generated by the Firebase console is needed also for the [TrafficSense client](https://github.com/aalto-trafficsense/trafficsense-android). If building a new client, extract the file now.
@@ -114,7 +116,7 @@ Set up and start the actual regular-routes (TrafficSense) server.
               "maps_api_key" : "<created in Google console>",
               "fmi_api_key" : "<request from the [Finnish Meteorological Institute](https://en.ilmatieteenlaitos.fi/open-data)>",
               "firebase_key" : "<[Firebase console](https://console.firebase.google.com/) Settings -> Project Settings -> Cloud messaging -> Project Credentials -> Server key>",
-              "mass_transit_live_keep_days" : "<days to store mass transit data obtained from Helsinki Regional Traffic>",  
+              "mass_transit_live_keep_days" : "<days to store mass transit data obtained from [DigiTransit](https://digitransit.fi/en/)>",  
               "gmail_from" : "<a gmail account the server sends email from (currently in the case a user presses the cancel participation button)>",
               "gmail_pwd" : "<the password for the above gmail account>",
               "email_to" : "<the email address where mail from the above address is sent>",
@@ -132,6 +134,7 @@ Set up and start the actual regular-routes (TrafficSense) server.
     * `$ cd /opt/regularroutes-cookbooks/cookbooks`
     * `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json`
     * If the script concludes without fatal errors, the server should be up and running.
+    * _Note: The current installation scripts have major issues with Chef v. 13. Please check problems and solutions below._
 1. *IF* waypoint generation was done on another server, restore the information from that database:
     * Transfer `my_waypoints.tar.gz` to the intended TrafficSense server e.g. with scp.
     * Unpack: `gunzip my_waypoints.tar.gz`
@@ -214,3 +217,18 @@ Need to copy (scp) files between two machines because there is no direct ssh con
 
 **Solution:**
 Do the scp from the receiving site.
+
+**Problem:**
+Chef installation script fails.
+
+**Solutions:**
+There are a multitude of issues at the moment:
+    * The current installation scripts have major issues with Chef v. 13. Downgrade to Chef v. 12 can be done with:
+       * `$ curl -L -O https://packages.chef.io/files/stable/chefdk/1.5.0/ubuntu/16.04/chefdk_1.5.0-1_amd64.deb`
+       * `$ sudo dpkg -i chefdk_1.5.0-1_amd64.deb`
+    * Also the following issues and fixes have been observed:
+       * `pip`fails with `Error executing action `run` on resource 'execute[install-pip]'`. Fix by updating `pip` with `$ sudo easy_install --upgrade pip`.
+       * `psycopg2` installation fails due to the existence of postgresql 10, even though it is not used: `creating pip-egg-info/psycopg2.egg-info` ... `Error: could not determine PostgreSQL version from '10.0'`. The problem has been fixed in `psycopg2`v. 2.7.x (and will not be backported), but the current requirements ask for v. 2.6. Fix by removing the version from `psycopg2` in `/opt/regularroutes/server/requirements.txt`. At the time of writing this installs 2.7.3, which appears to be working fine.
+       * The old `pyOenSSL` also causes problems during installation. Current requirement is v. 0.14; can be bumped up to v. 16.2.0.
+       * `nginx` server may also complain about problems during reload: `Error executing action `reload` on resource 'service[nginx]'`. Root cause not clear; manual restart using `$ /etc/init.d/nginx restart` runs without problems.
+
