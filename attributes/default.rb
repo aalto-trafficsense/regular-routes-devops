@@ -11,3 +11,5 @@ default['regularroutes']['osm_url'] = 'http://download.geofabrik.de/europe/finla
 default['postgis']['version'] = "2.2"
 default['regularroutes']['reverse_geocoding_uri_template'] = '';
 default['regularroutes']['reverse_geocoding_queries_per_second'] = '';
+default['postgresql']['effective_cache_size'] = '4GB';
+default['postgresql']['work_mem'] = '4MB';
