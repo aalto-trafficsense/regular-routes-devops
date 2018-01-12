@@ -3,6 +3,7 @@
 #
 #[Unit]
 #Description=Regularroutes dev
+#Requires=postgresql.service
 #
 #[Service]
 #Environment=REGULARROUTES_SETTINGS=/opt/regularroutes/regularroutes.cfg
