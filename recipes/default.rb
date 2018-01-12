@@ -71,7 +71,7 @@ template '/opt/regularroutes/regularroutes.cfg' do
 end
 
 git '/opt/regularroutes/server' do
-  repository 'https://github.com/aalto-trafficsense/regular-routes-server'
+  repository node[:regularroutes][:server_git_url]
   revision node[:regularroutes][:server_branch]
   action :checkout
   action :sync

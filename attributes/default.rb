@@ -6,6 +6,7 @@ default['regularroutes']['mass_transit_live_keep_days'] = '7';
 default['regularroutes']['gmail_from'] = '';
 default['regularroutes']['gmail_pwd'] = '';
 default['regularroutes']['email_to'] = '';
+default['regularroutes']['server_git_url'] = 'https://github.com/aalto-trafficsense/regular-routes-server';
 default['regularroutes']['server_branch'] = 'master';
 default['regularroutes']['osm_url'] = 'http://download.geofabrik.de/europe/finland-latest.osm.pbf'
 default['postgis']['version'] = "2.2"
