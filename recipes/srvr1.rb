@@ -106,24 +106,3 @@ cookbook_file "#{node.nginx.dir}/sites-available/regularroutes.conf" do
 end
 
 nginx_site "regularroutes.conf"
-
-# MJR added 16.4.2018: Wait until postgresql start is complete,
-# otherwise psycopg2 database connections fail in a new installation
-sleep(10)
-
-service "regularroutes-api" do
-  action [:restart, :enable]
-end
-
-service "regularroutes-site" do
-  action [:restart, :enable]
-end
-
-# MJR: Commenting out 3.6.2016 as the dev interface must not be available on production servers
-# service "regularroutes-dev" do
-#   action [:restart, :enable]
-# end
-
-service "regularroutes-scheduler" do
-  action [:restart, :enable]
-end

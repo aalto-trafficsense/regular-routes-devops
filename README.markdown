@@ -153,7 +153,7 @@ If needed, individual services can be stopped, started and re-started with
 * `restart` can be replaced with `stop`, `start` etc.
 * `regularroutes-api` can be replaced with `regularroutes-site`, `regularroutes-dev` or `regularroutes-scheduler`.
 * The functions of the different components are described in the [regular-routes-server readme](https://github.com/aalto-trafficsense/regular-routes-server/blob/master/README.md).
-    
+
 Logs will be in `/var/log/upstart/` (upstart) or `$ journalctl --unit regularroutes-api` and similar (systemd)
 
 D: Setting up local development server using Virtualbox and Vagrant
@@ -168,6 +168,12 @@ D: Setting up local development server using Virtualbox and Vagrant
 
 *Note! No need to run Berks or Chef manually since Vagrantfile specifies the Chef Cookbook used to setup server*
 
+Vagrant offers server sharing through internet for testing a local copy of the server (not for production!). At least in some installations the share plugin is missing. If that is the case, first install the plugin:
+
+`$ vagrant plugin install vagrant-share`
+
+Vagrant share plugin requires [ngrok](https://ngrok.com/download).
+
 
 E: Importing Open Street map data from crossings-repository
 -----------------------------------------------------------
@@ -175,7 +181,7 @@ E: Importing Open Street map data from crossings-repository
 Method alternative to running the waypoint-generation with the chef-script, as explained above, and only does the first step of importing. MJR: Should this be archived somewhere else as obsolete?
 
 * Remarks 1: Waypoint (crossings) data is in Open Street Map (osm) formatting
-* Remarks 2: This instructions expects you to have vagrant up and running with PostgreSQL (+PostGIS) database service up & running and port forwarding to db service to port 5432 at localhost 
+* Remarks 2: This instructions expects you to have vagrant up and running with PostgreSQL (+PostGIS) database service up & running and port forwarding to db service to port 5432 at localhost
 
 1. Download and **install osm2pgsql** (http://wiki.openstreetmap.org/wiki/Osm2pgsql#Installation)
 2. clone crossings repo or just **download the target osm file**
@@ -183,7 +189,7 @@ Method alternative to running the waypoint-generation with the chef-script, as e
 ```
     osm2pgsql -s -H localhost -P 5432 -U regularroutes -d regularroutes -W <path_to_osm_file>
 ```
-**Wait for osm2pgsql to finish it's job and you are done** 
+**Wait for osm2pgsql to finish it's job and you are done**
 
 * The parameters for osm2pgsql are:
    * -s (slim Mode, recommended)
@@ -196,12 +202,12 @@ Method alternative to running the waypoint-generation with the chef-script, as e
 
 F: Problem(s) and Solutions
 ---------------------------
-**Problem:** 
+**Problem:**
 ```
 Vagrant::Errors::NetworkDHCPAlreadyAttached: A host only network interface you're attempting to configure via DHCP already has a conflicting host only adapter with DHCP enabled
 ```
 
-**Solution:** 
+**Solution:**
 Execute the following command in shell:
 ```
 VBoxManage dhcpserver remove --netname HostInterfaceNetworking-vboxnet0
@@ -238,4 +244,3 @@ There are a multitude of issues at the moment:
     * `psycopg2` installation fails due to the existence of postgresql 10, even though it is not used: `creating pip-egg-info/psycopg2.egg-info` ... `Error: could not determine PostgreSQL version from '10.0'`. The problem has been fixed in `psycopg2`v. 2.7.x (and will not be backported), but the current requirements ask for v. 2.6. Fix by removing the version from `psycopg2` in `/opt/regularroutes/server/requirements.txt`. At the time of writing this installs 2.7.3, which appears to be working fine.
     * The old `pyOenSSL` also causes problems during installation. Current requirement is v. 0.14; can be bumped up to v. 16.2.0.
     * `nginx` server may also complain about problems during reload: `Error executing action `reload` on resource 'service[nginx]'`. Root cause not clear; manual restart using `$ /etc/init.d/nginx restart` runs without problems.
-
