@@ -99,12 +99,12 @@ Vagrant.configure("2") do |config|
     # Latest chef:
     # curl -L https://www.chef.io/chef/install.sh | bash
     # Old chef:
-    cd /vagrant/setup-files
-    CHEF_FILE=chefdk_1.5.0-1_amd64.deb
-    if [ ! -f $CHEF_FILE ]; then
-      curl -L -O "https://packages.chef.io/files/stable/chefdk/1.5.0/ubuntu/16.04/${CHEF_FILE}"
-    fi
-    dpkg -i $CHEF_FILE
+    # cd /vagrant/setup-files
+    # CHEF_FILE=chefdk_1.5.0-1_amd64.deb
+    # if [ ! -f $CHEF_FILE ]; then
+    #   curl -L -O "https://packages.chef.io/files/stable/chefdk/1.5.0/ubuntu/16.04/${CHEF_FILE}"
+    # fi
+    # dpkg -i $CHEF_FILE
     adduser --system --group lerero
     # Easier to read systemd-logs afterwards:
     adduser vagrant systemd-journal
@@ -113,25 +113,25 @@ Vagrant.configure("2") do |config|
     mkdir regularroutes-cookbooks
     cd regularroutes-cookbooks
     tar xfz /vagrant/setup-files/cookbooks-1523903264.tar.gz
-    cp /vagrant/setup-files/regularroutes-srvr.json /opt/regularroutes-cookbooks
+    # cp /vagrant/setup-files/regularroutes-srvr.json /opt/regularroutes-cookbooks
+    # chgrp lerero regularroutes-srvr.json
+    # chmod 0640 regularroutes-srvr.json
     cp /vagrant/setup-files/client_secrets.json /opt/regularroutes
-    chgrp lerero regularroutes-srvr.json
-    chmod 0640 regularroutes-srvr.json
     wait
   SHELL
-
-  # Nicer example checking file existence: https://gist.github.com/mlafeldt/7120176
+  # chef-client --local-mode -j regularroutes-srvr.json -o regularroutes::srvr1
   config.vm.provision :chef_zero do |chef|
-    chef.json = Hash[*JSON.parse(IO.read("regularroutes-srvr.json")).first]
+    chef.version = "12.22.3"
+    chef.nodes_path = "temp"
+    chef.json = Hash[*JSON.parse(IO.read('setup-files/regularroutes-srvr.json')).first]
     chef.run_list = [
       "recipe[regularroutes::srvr1]"
     ]
   end
-
-    # chef-client --local-mode -j regularroutes-srvr.json -o regularroutes::srvr1
-  if File.exists?(File."/vagrant/setup-files/my_waypoints.tar")
+  # Nicer example checking file existence: https://gist.github.com/mlafeldt/7120176
+  if File.exists?("/vagrant/setup-files/my_waypoints.tar")
+    # RESTORE PRE-GENERATED WAYPOINTS
     config.vm.provision "shell", inline: <<-SHELL
-      # RESTORE PRE-GENERATED WAYPOINTS. Comment the following lines out if generating the waypoints during this setup
       # (Combining: https://stackoverflow.com/a/20871573/5528498 and https://stackoverflow.com/q/1955505/5528498)
       echo "$(echo "127.0.0.1:5432:regularroutes:regularroutes:")""$(grep -Po '"'"db_password"'"\s*:\s*"\K([^"]*)' regularroutes-srvr.json)" > /home/vagrant/.pgpass
       chmod 0600 /home/vagrant/.pgpass
@@ -140,19 +140,26 @@ Vagrant.configure("2") do |config|
       wait
     SHELL
   else
-    if File.exists?(File."/vagrant/setup-files/regularroutes-wpts.json")
-      cp /vagrant/setup-files/regularroutes-wpts.json /opt/regularroutes-cookbooks
+    if File.exists?("/vagrant/setup-files/regularroutes-wpts.json")
+      # GENERATE WAYPOINT TABLES
+      # config.vm.provision "shell", inline: <<-SHELL
+      #   cp /vagrant/setup-files/regularroutes-wpts.json /opt/regularroutes-cookbooks
+      #   chgrp lerero regularroutes-wpts.json
+      #   chmod 0640 regularroutes-wpts.json
+      # SHELL
       config.vm.provision :chef_zero do |chef|
-        chef.json = JSON.parse(IO.read("regularroutes-wpts.json"))
+        chef.version = "12.22.3"
+        chef.nodes_path = "temp"
+        chef.json = JSON.parse(IO.read('setup-files/regularroutes-wpts.json'))
+      end
     end
   end
-    # GENERATE WAYPOINT TABLES
-    # TODO: Add waypoint generation
-
+  # chef-client --local-mode -o regularroutes::srvr2
   config.vm.provision :chef_zero do |chef|
+    chef.version = "12.22.3"
+    chef.nodes_path = "temp"
     chef.run_list = [
       "recipe[regularroutes::srvr2]"
     ]
   end
-    # chef-client --local-mode -o regularroutes::srvr2
 end
