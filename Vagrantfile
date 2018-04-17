@@ -113,9 +113,11 @@ Vagrant.configure("2") do |config|
     mkdir regularroutes-cookbooks
     cd regularroutes-cookbooks
     tar xfz /vagrant/setup-files/cookbooks-1523903264.tar.gz
-    # cp /vagrant/setup-files/regularroutes-srvr.json /opt/regularroutes-cookbooks
-    # chgrp lerero regularroutes-srvr.json
-    # chmod 0640 regularroutes-srvr.json
+    # Note: The copy of regularroutes-srvr.json is not used, but in non-Vagrant installations and
+    #       later manual updates it is expected to be in /opt/regularroutes-cookbooks
+    cp /vagrant/setup-files/regularroutes-srvr.json /opt/regularroutes-cookbooks
+    chgrp lerero regularroutes-srvr.json
+    chmod 0640 regularroutes-srvr.json
     cp /vagrant/setup-files/client_secrets.json /opt/regularroutes
     wait
   SHELL
@@ -128,25 +130,31 @@ Vagrant.configure("2") do |config|
       "recipe[regularroutes::srvr1]"
     ]
   end
+  # Store the db_password for script use
+  open("setup-files/.pgpass", 'w') {|f| f.puts "127.0.0.1:5432:regularroutes:regularroutes:" + JSON.parse(IO.read('setup-files/regularroutes-srvr.json'))['regularroutes']['db_password'] }
+  config.vm.provision "shell", inline: <<-SHELL
+    rm -f /home/vagrant/.pgpass
+    mv /vagrant/setup-files/.pgpass /home/vagrant/.pgpass
+    chmod 0600 /home/vagrant/.pgpass
+    chown vagrant:vagrant /home/vagrant/.pgpass
+  SHELL
   # Nicer example checking file existence: https://gist.github.com/mlafeldt/7120176
-  if File.exists?("/vagrant/setup-files/my_waypoints.tar")
+  if File.exists?('setup-files/my_waypoints.tar')
     # RESTORE PRE-GENERATED WAYPOINTS
     config.vm.provision "shell", inline: <<-SHELL
-      # (Combining: https://stackoverflow.com/a/20871573/5528498 and https://stackoverflow.com/q/1955505/5528498)
-      echo "$(echo "127.0.0.1:5432:regularroutes:regularroutes:")""$(grep -Po '"'"db_password"'"\s*:\s*"\K([^"]*)' regularroutes-srvr.json)" > /home/vagrant/.pgpass
-      chmod 0600 /home/vagrant/.pgpass
-      chown vagrant:vagrant /home/vagrant/.pgpass
       su -c "pg_restore -h 127.0.0.1 -U regularroutes -d regularroutes /vagrant/setup-files/my_waypoints.tar" vagrant
       wait
     SHELL
   else
-    if File.exists?("/vagrant/setup-files/regularroutes-wpts.json")
+    if File.exists?('setup-files/regularroutes-wpts.json')
       # GENERATE WAYPOINT TABLES
-      # config.vm.provision "shell", inline: <<-SHELL
-      #   cp /vagrant/setup-files/regularroutes-wpts.json /opt/regularroutes-cookbooks
-      #   chgrp lerero regularroutes-wpts.json
-      #   chmod 0640 regularroutes-wpts.json
-      # SHELL
+      config.vm.provision "shell", inline: <<-SHELL
+        # Note: The copy of regularroutes-wpts.json is not used, but in non-Vagrant installations and
+        #       later manual updates it is expected to be in /opt/regularroutes-cookbooks
+        cp /vagrant/setup-files/regularroutes-wpts.json /opt/regularroutes-cookbooks
+        chgrp lerero regularroutes-wpts.json
+        chmod 0640 regularroutes-wpts.json
+      SHELL
       config.vm.provision :chef_zero do |chef|
         chef.version = "12.22.3"
         chef.nodes_path = "temp"
