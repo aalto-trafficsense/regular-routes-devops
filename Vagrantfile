@@ -76,35 +76,14 @@ Vagrant.configure("2") do |config|
   # to skip installing and copying to Vagrant's shelf.
   # config.berkshelf.except = []
 
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   apt-get update
-  #   apt-get install -y apache2
-  # SHELL
   # Directory `setup-files` under root (same directory holding this Vagrantfile)
   # should have the following files:
-  # The gzipped cookbooks. Update file name below, e.g.: cookbooks-1515778441.tar.gz
-  # If using the old package, chef 12 for downgrading purposes. Can be obtained with:
-  # curl -L -O https://packages.chef.io/files/stable/chefdk/1.5.0/ubuntu/16.04/chefdk_1.5.0-1_amd64.deb
-  # ...so the resulting file is:
-  # chefdk_1.5.0-1_amd64.deb
   config.vm.provision "shell", inline: <<-SHELL
     timedatectl set-timezone Europe/Helsinki
     sh -c "echo 'LANGUAGE=en_US.UTF-8\nLC_ALL=en_US.UTF-8\nLC_CTYPE=en_US.UTF-8' >> /etc/default/locale"
     apt-get update
     apt-get install -y curl
     apt-get install -y build-essential python-pip python-dev gfortran libatlas-base-dev libblas-dev liblapack-dev libssl-dev
-    # Latest chef:
-    # curl -L https://www.chef.io/chef/install.sh | bash
-    # Old chef:
-    # cd /vagrant/setup-files
-    # CHEF_FILE=chefdk_1.5.0-1_amd64.deb
-    # if [ ! -f $CHEF_FILE ]; then
-    #   curl -L -O "https://packages.chef.io/files/stable/chefdk/1.5.0/ubuntu/16.04/${CHEF_FILE}"
-    # fi
-    # dpkg -i $CHEF_FILE
     adduser --system --group lerero
     # Easier to read systemd-logs afterwards:
     adduser vagrant systemd-journal
@@ -112,7 +91,6 @@ Vagrant.configure("2") do |config|
     mkdir regularroutes
     mkdir regularroutes-cookbooks
     cd regularroutes-cookbooks
-    tar xfz /vagrant/setup-files/cookbooks-1523903264.tar.gz
     # Note: The copy of regularroutes-srvr.json is not used, but in non-Vagrant installations and
     #       later manual updates it is expected to be in /opt/regularroutes-cookbooks
     cp /vagrant/setup-files/regularroutes-srvr.json /opt/regularroutes-cookbooks
@@ -121,7 +99,6 @@ Vagrant.configure("2") do |config|
     cp /vagrant/setup-files/client_secrets.json /opt/regularroutes
     wait
   SHELL
-  # chef-client --local-mode -j regularroutes-srvr.json -o regularroutes::srvr1
   config.vm.provision :chef_zero do |chef|
     chef.version = "12.22.3"
     chef.nodes_path = "temp"
@@ -162,7 +139,6 @@ Vagrant.configure("2") do |config|
       end
     end
   end
-  # chef-client --local-mode -o regularroutes::srvr2
   config.vm.provision :chef_zero do |chef|
     chef.version = "12.22.3"
     chef.nodes_path = "temp"
