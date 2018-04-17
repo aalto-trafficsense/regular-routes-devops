@@ -14,6 +14,7 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "ubuntu/xenial64"
+  # config.disksize.size = '50GB'
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -76,8 +77,6 @@ Vagrant.configure("2") do |config|
   # to skip installing and copying to Vagrant's shelf.
   # config.berkshelf.except = []
 
-  # Directory `setup-files` under root (same directory holding this Vagrantfile)
-  # should have the following files:
   config.vm.provision "shell", inline: <<-SHELL
     timedatectl set-timezone Europe/Helsinki
     sh -c "echo 'LANGUAGE=en_US.UTF-8\nLC_ALL=en_US.UTF-8\nLC_CTYPE=en_US.UTF-8' >> /etc/default/locale"
@@ -128,7 +127,8 @@ Vagrant.configure("2") do |config|
       config.vm.provision "shell", inline: <<-SHELL
         # Note: The copy of regularroutes-wpts.json is not used, but in non-Vagrant installations and
         #       later manual updates it is expected to be in /opt/regularroutes-cookbooks
-        cp /vagrant/setup-files/regularroutes-wpts.json /opt/regularroutes-cookbooks
+        cd /opt/regularroutes-cookbooks
+        cp /vagrant/setup-files/regularroutes-wpts.json .
         chgrp lerero regularroutes-wpts.json
         chmod 0640 regularroutes-wpts.json
       SHELL
