@@ -6,6 +6,8 @@ These instructions assume the use of [Chef](https://www.chef.io/) for installati
 1. A local computer.
 1. A server, on which you have owner (root) privileges. Temporary servers on e.g. [Digital Ocean](https://www.digitalocean.com/) can be used as fully featured TrafficSense servers for e.g. waypoint generation or client testing.
 
+Setting up a (test) server on [Vagrant](https://www.vagrantup.com/) can be done with one command using the `Vagrantfile` in this directory, please refer to D below.
+
 A: Cookbook operations
 ----------------------
 
@@ -72,7 +74,7 @@ If you have a set of waypoints from your target area, you may skip to step C.
     * `$ sudo chef-client --local-mode -j ../regularroutes-wpts.json`
     * _Note: The current installation scripts have major issues with Chef v. 13. Check problems and solutions below._
 1. *IF* waypoint generation was done on another server than the intended production server, package and save the resulting waypoints table:
-    * `$ pg_dump -h 127.0.0.1 -U regularroutes -W regularroutes -F t -t waypoints -t roads -t roads_waypoints > my_waypoints.tar`
+    * `$ pg_dump -h 127.0.0.1 -U regularroutes -d regularroutes -F t -t waypoints -t roads -t roads_waypoints > my_waypoints.tar`
     * Pack: `gzip my_waypoints.tar`
     * Transfer `my_waypoints.tar.gz` to your intended production server (or at least a temporary safe location) e.g. with scp.
 
@@ -156,23 +158,35 @@ If needed, individual services can be stopped, started and re-started with
 
 Logs will be in `/var/log/upstart/` (upstart) or `$ journalctl --unit regularroutes-api` and similar (systemd)
 
-D: Setting up local development server using Virtualbox and Vagrant
+D: Setting up a local development server using Virtualbox and Vagrant
 -------------------------------------------------------------------
 
 1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+    * On OSX & brew: `$ brew cask install virtualbox`
 1. Install [Vagrant](https://www.vagrantup.com/downloads.html)
-1. Install Vagrant Berkshelf plugin  
-        `vagrant plugin install vagrant-berkshelf`  
-1. Run Vagrant in the devops repository directory (where Vagrantfile is)  
-        `vagrant up`  
+    * On OSX & brew: `$ brew cask install vagrant`
+1. Install Vagrant Berkshelf plugin
+    * `$ vagrant plugin install vagrant-berkshelf`
+1. Create the following configuration files and place them in directory `setup-files` in the devops repository directory (where Vagrantfile is)
+    * `client_secrets.json` as instructed in section C above.
+    * `regularroutes-srvr.json` as instructed in section C above.
+    * if you have a waypoints dump as instructed in section B above, it should be called `my_waypoints.tar`
+    * if `my_waypoints.tar` is not found, the script will look for `regularroutes-wpts.json` (format at instructed in section B above) and generate the waypoints. In this case more memory and a bigger disk are needed. `vagrant plugin install vagrant-disksize`, uncomment line `config.disksize.size = '50GB'` and increase memory `vb.memory = "4096"` in Vagrantfile.
+    * if neither waypoint file is present, the script will continue, but all regularroutes services will fail to start because of the missing waypoints table.
+1. Run Vagrant in the devops repository directory  
+    * `$ vagrant up`
+1. Log into your new server
+    * `$ vagrant ssh`
+1. Host port 8080 is mapped to guest port 80 in `Vagrantfile`, so opening `localhost:8080` in a browser in the host machine should produce the sign-in page of `regularroutes-site`.
+1. Remember: If everything went well, all services are running and e.g. `mass_transit_data` is being collected every 30 seconds. If this is undesirable, stop the regularroutes-scheduler service.
 
-*Note! No need to run Berks or Chef manually since Vagrantfile specifies the Chef Cookbook used to setup server*
+Note: No need to run Berks or Chef manually, all taken care of by the vagrant-berkshelf plugin and chef_zero provisioner of Vagrant.
 
-Vagrant offers server sharing through internet for testing a local copy of the server (not for production!). At least in some installations the share plugin is missing. If that is the case, first install the plugin:
+Note 2: Vagrant offers server sharing through internet for testing a local copy of the server (not for production!). At least in some installations the share plugin is missing. If that is the case, first install the plugin:
 
 `$ vagrant plugin install vagrant-share`
 
-Vagrant share plugin requires [ngrok](https://ngrok.com/download).
+Vagrant share plugin requires [ngrok](https://ngrok.com/download). Available also over brew for OS X: `brew cask install ngrok`. After the plugin is installed `vagrant share` will start sharing and print the generated server URL.
 
 
 E: Importing Open Street map data from crossings-repository
