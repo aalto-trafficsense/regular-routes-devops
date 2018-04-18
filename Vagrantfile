@@ -106,8 +106,10 @@ Vagrant.configure("2") do |config|
       "recipe[regularroutes::srvr1]"
     ]
   end
-  # Store the db_password for script use
-  open("setup-files/.pgpass", 'w') {|f| f.puts "127.0.0.1:5432:regularroutes:regularroutes:" + JSON.parse(IO.read('setup-files/regularroutes-srvr.json'))['regularroutes']['db_password'] }
+  if (not provisioned?) || explicit_provisioning?
+    # Extract db_password from JSON and store for command line use
+    open("setup-files/.pgpass", 'w') {|f| f.puts "127.0.0.1:5432:regularroutes:regularroutes:" + JSON.parse(IO.read('setup-files/regularroutes-srvr.json'))['regularroutes']['db_password'] }
+  end
   config.vm.provision "shell", inline: <<-SHELL
     rm -f /home/vagrant/.pgpass
     mv /vagrant/setup-files/.pgpass /home/vagrant/.pgpass
@@ -146,4 +148,13 @@ Vagrant.configure("2") do |config|
       "recipe[regularroutes::srvr2]"
     ]
   end
+end
+
+# Credits: https://stackoverflow.com/a/45612332/5528498
+def provisioned?(vm_name='default', provider='virtualbox')
+  File.exists?(File.join(File.dirname(__FILE__),".vagrant/machines/#{vm_name}/#{provider}/action_provision"))
+end
+
+def explicit_provisioning?()
+   (ARGV.include?("reload") && ARGV.include?("--provision")) || ARGV.include?("provision")
 end
