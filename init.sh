@@ -28,12 +28,7 @@ echo "********************************************************************"
 echo "Installing a chef-client (https://www.chef.io/download-chef-client/)"
 echo "Sample location /opt/chef/ is assumed."
 
-# Installing latest chef no longer works with the current recipes. Commenting out:
-# curl -L https://www.chef.io/chef/install.sh | sudo bash
-
-# Install old chef instead:
 cd /opt/regularroutes
-curl -L -O https://packages.chef.io/files/stable/chefdk/1.5.0/ubuntu/16.04/chefdk_1.5.0-1_amd64.deb
-sudo dpkg -i chefdk_1.5.0-1_amd64.deb
-rm chefdk_1.5.0-1_amd64.deb
+curl -L https://www.chef.io/chef/install.sh | sudo bash
+rm install.sh
 cd -

@@ -81,7 +81,7 @@ Vagrant.configure("2") do |config|
     timedatectl set-timezone Europe/Helsinki
     sh -c "echo 'LANGUAGE=en_US.UTF-8\nLC_ALL=en_US.UTF-8\nLC_CTYPE=en_US.UTF-8' >> /etc/default/locale"
     apt-get update
-    apt-get install -y curl
+    # apt-get install -y curl # The box already has curl
     apt-get install -y build-essential python-pip python-dev gfortran libatlas-base-dev libblas-dev liblapack-dev libssl-dev
     adduser --system --group lerero
     # Easier to read systemd-logs afterwards:

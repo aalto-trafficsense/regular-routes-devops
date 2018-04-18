@@ -1,5 +1,5 @@
-include_recipe 'postgresql::libpq'
-include_recipe 'postgresql::postgis'
+# include_recipe 'postgresql::libpq'
+# include_recipe 'postgresql::postgis'
 include_recipe 'postgresql::server'
 
 package 'git'
@@ -15,9 +15,12 @@ postgresql_database 'regularroutes' do
   encoding 'UTF-8'
 end
 
-postgresql_extension 'postgis' do
-  database 'regularroutes'
-end
+# MJR commented out 30.10.2017
+# postgresql_extension 'postgis' do
+#   database 'regularroutes'
+# end
+node['postgis']['template_name'] = 'regularroutes'
+include_recipe 'postgis::default'
 
 user 'lerero' do
   system true

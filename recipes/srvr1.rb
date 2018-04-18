@@ -57,8 +57,13 @@ end
 
 include_recipe 'regularroutes::_base'
 include_recipe 'nginx'
-include_recipe 'python::pip'
-include_recipe 'python::virtualenv'
+# MJR 30.10.2017: According to poise-python documentation (https://supermarket.chef.io/cookbooks/poise-python, "Upgrading from the python Cookbook")
+# the following two recipes are no longer needed "as installing those things is now part of the python_runtime resource"
+# include_recipe 'python::pip'
+# include_recipe 'python::virtualenv'
+
+# MJR added 30.10.2017 for poise-python
+python_runtime '2'
 
 package 'libffi-dev'
 package 'python-dev'
@@ -82,19 +87,35 @@ end
 #   cwd '/opt/regularroutes/server/static/icon'
 # end
 
-python_virtualenv '/opt/regularroutes/virtualenv' do
+# MJR 30.10.2017 replacing the following:
+# python_virtualenv '/opt/regularroutes/virtualenv' do
+#   owner 'root'
+#   group 'root'
+#   action :create
+# end
+# with the following (based on poise-python documentation)
+directory '/opt/regularroutes/virtualenv' do
   owner 'root'
   group 'root'
   action :create
 end
+python_virtualenv '/opt/regularroutes/virtualenv'
 
-python_pip 'gunicorn' do
+# MJR 30.10.2017 replacing the following:
+# python_pip 'gunicorn' do
+#   virtualenv '/opt/regularroutes/virtualenv'
+# end
+# with the following (based on poise-python documentation)
+python_package 'gunicorn' do
   virtualenv '/opt/regularroutes/virtualenv'
 end
 
-execute '/opt/regularroutes/virtualenv/bin/pip install -r /opt/regularroutes/server/requirements.txt' do
-  cwd '/opt/regularroutes'
-end
+# MJR 30.10.2017 replacing the following:
+# execute '/opt/regularroutes/virtualenv/bin/pip install -r /opt/regularroutes/server/requirements.txt' do
+#   cwd '/opt/regularroutes'
+# end
+# with the following (based on poise-python documentation)
+pip_requirements '/opt/regularroutes/server/requirements.txt'
 
 nginx_site "default" do
   enable false
