@@ -56,14 +56,42 @@ service "regularroutes-scheduler" do
 end
 
 include_recipe 'regularroutes::_base'
-include_recipe 'nginx'
+
+# include_recipe 'nginx'
+
+package 'nginx' do
+  action :install
+end
+
+cookbook_file "#{node['nginx']['dir']}/sites-available/regularroutes.conf" do
+  source "nginx-site.conf"
+  mode "0644"
+end
+
+service 'nginx' do
+  action [ :enable, :start ]
+end
+
+# nginx_site "default" do
+#   enable false
+# end
+#
+
+# nginx_site "regularroutes.conf"
+
 # MJR 30.10.2017: According to poise-python documentation (https://supermarket.chef.io/cookbooks/poise-python, "Upgrading from the python Cookbook")
 # the following two recipes are no longer needed "as installing those things is now part of the python_runtime resource"
 # include_recipe 'python::pip'
 # include_recipe 'python::virtualenv'
 
 # MJR added 30.10.2017 for poise-python
-python_runtime '2'
+python_runtime '3' do
+  provider :system
+  options package_name: 'python3'
+  pip_version false
+  setuptools_version false
+  wheel_version false
+end
 
 package 'libffi-dev'
 package 'python-dev'
@@ -99,31 +127,37 @@ directory '/opt/regularroutes/virtualenv' do
   group 'root'
   action :create
 end
-python_virtualenv '/opt/regularroutes/virtualenv'
+
+python_virtualenv '/opt/regularroutes/virtualenv' do
+  python '3'
+  pip_version false
+  setuptools_version false
+  wheel_version false
+end
 
 # MJR 30.10.2017 replacing the following:
 # python_pip 'gunicorn' do
 #   virtualenv '/opt/regularroutes/virtualenv'
 # end
 # with the following (based on poise-python documentation)
-python_package 'gunicorn' do
-  virtualenv '/opt/regularroutes/virtualenv'
-end
+# python_package 'gunicorn' do
+#   virtualenv '/opt/regularroutes/virtualenv'
+# end
 
 # MJR 30.10.2017 replacing the following:
 # execute '/opt/regularroutes/virtualenv/bin/pip install -r /opt/regularroutes/server/requirements.txt' do
 #   cwd '/opt/regularroutes'
 # end
 # with the following (based on poise-python documentation)
-pip_requirements '/opt/regularroutes/server/requirements.txt'
+# pip_requirements '/opt/regularroutes/server/requirements.txt' do
+#   virtualenv '/opt/regularroutes/virtualenv'
+# end
 
-nginx_site "default" do
-  enable false
+bash 'do_python' do
+  cwd '/opt/regularroutes/'
+  code <<-EOH
+    /opt/regularroutes/virtualenv/bin/pip install setuptools
+    /opt/regularroutes/virtualenv/bin/pip install gunicorn
+    /opt/regularroutes/virtualenv/bin/pip install -r /opt/regularroutes/server/requirements.txt
+  EOH
 end
-
-cookbook_file "#{node.nginx.dir}/sites-available/regularroutes.conf" do
-  source "nginx-site.conf"
-  mode "0644"
-end
-
-nginx_site "regularroutes.conf"
