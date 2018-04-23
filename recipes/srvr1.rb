@@ -57,6 +57,8 @@ end
 
 include_recipe 'regularroutes::_base'
 
+# A basic working solution is here: https://medium.com/@pierangelo1982/a-basic-nginx-cookbook-for-chef-ba95d801dbf3
+
 # include_recipe 'nginx'
 
 package 'nginx' do
@@ -72,19 +74,7 @@ service 'nginx' do
   action [ :enable, :start ]
 end
 
-# nginx_site "default" do
-#   enable false
-# end
-#
 
-# nginx_site "regularroutes.conf"
-
-# MJR 30.10.2017: According to poise-python documentation (https://supermarket.chef.io/cookbooks/poise-python, "Upgrading from the python Cookbook")
-# the following two recipes are no longer needed "as installing those things is now part of the python_runtime resource"
-# include_recipe 'python::pip'
-# include_recipe 'python::virtualenv'
-
-# MJR added 30.10.2017 for poise-python
 python_runtime '3' do
   provider :system
   options package_name: 'python3'
@@ -110,18 +100,7 @@ git '/opt/regularroutes/server' do
   action :sync
 end
 
-# MJR commented out 3.6.2016: Current html picks the favicon from static/icon
-# execute 'cp favicon.ico /var/www/html/' do
-#   cwd '/opt/regularroutes/server/static/icon'
-# end
 
-# MJR 30.10.2017 replacing the following:
-# python_virtualenv '/opt/regularroutes/virtualenv' do
-#   owner 'root'
-#   group 'root'
-#   action :create
-# end
-# with the following (based on poise-python documentation)
 directory '/opt/regularroutes/virtualenv' do
   owner 'root'
   group 'root'
@@ -135,20 +114,14 @@ python_virtualenv '/opt/regularroutes/virtualenv' do
   wheel_version false
 end
 
-# MJR 30.10.2017 replacing the following:
-# python_pip 'gunicorn' do
-#   virtualenv '/opt/regularroutes/virtualenv'
-# end
-# with the following (based on poise-python documentation)
+# Currently disabled, since poise-python crashes due to a faulty rexexp thinking that pip version > 10 are older than v. 6
+# Resurrect, when postgresql_lwrp (or another postgresql-cookbook) learns to use newer poise-python than 1.6.0
+# Also allow pip, setuptools and wheel updates to virtualenv above, when that happens.
+
 # python_package 'gunicorn' do
 #   virtualenv '/opt/regularroutes/virtualenv'
 # end
 
-# MJR 30.10.2017 replacing the following:
-# execute '/opt/regularroutes/virtualenv/bin/pip install -r /opt/regularroutes/server/requirements.txt' do
-#   cwd '/opt/regularroutes'
-# end
-# with the following (based on poise-python documentation)
 # pip_requirements '/opt/regularroutes/server/requirements.txt' do
 #   virtualenv '/opt/regularroutes/virtualenv'
 # end
