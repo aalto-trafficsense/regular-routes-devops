@@ -77,20 +77,22 @@ Vagrant.configure("2") do |config|
   # to skip installing and copying to Vagrant's shelf.
   # config.berkshelf.except = []
 
+  CHEF_VERSION = "14.0.202"
+
   config.vm.provision "shell", inline: <<-SHELL
     timedatectl set-timezone Europe/Helsinki
     sh -c "echo 'LANGUAGE=en_US.UTF-8\nLC_ALL=en_US.UTF-8\nLC_CTYPE=en_US.UTF-8' >> /etc/default/locale"
     apt-get update
-    # apt-get install -y curl # The box already has curl
+    # apt-get install -y curl # ubuntu/xenial64 box already has an up-to-date curl, uncomment if a future box doesn't
     apt-get install -y build-essential python-pip python-dev gfortran libatlas-base-dev libblas-dev liblapack-dev libssl-dev
     adduser --system --group lerero
-    # Easier to read systemd-logs afterwards:
+    # Easier to access systemd-logs afterwards
     adduser vagrant systemd-journal
     cd /opt
     mkdir regularroutes
     mkdir regularroutes-cookbooks
     cd regularroutes-cookbooks
-    # Note: The copy of regularroutes-srvr.json is not used, but in non-Vagrant installations and
+    # Note: Thus copy of regularroutes-srvr.json is currently not used, but in non-Vagrant installations and
     #       later manual updates it is expected to be in /opt/regularroutes-cookbooks
     cp /vagrant/setup-files/regularroutes-srvr.json /opt/regularroutes-cookbooks
     chgrp lerero regularroutes-srvr.json
@@ -99,7 +101,7 @@ Vagrant.configure("2") do |config|
     wait
   SHELL
   config.vm.provision :chef_zero do |chef|
-    chef.version = "12.22.3"
+    chef.version = CHEF_VERSION
     chef.nodes_path = "temp"
     chef.json = Hash[*JSON.parse(IO.read('setup-files/regularroutes-srvr.json')).first]
     chef.run_list = [
@@ -135,14 +137,14 @@ Vagrant.configure("2") do |config|
         chmod 0640 regularroutes-wpts.json
       SHELL
       config.vm.provision :chef_zero do |chef|
-        chef.version = "12.22.3"
+        chef.version = CHEF_VERSION
         chef.nodes_path = "temp"
         chef.json = JSON.parse(IO.read('setup-files/regularroutes-wpts.json'))
       end
     end
   end
   config.vm.provision :chef_zero do |chef|
-    chef.version = "12.22.3"
+    chef.version = CHEF_VERSION
     chef.nodes_path = "temp"
     chef.run_list = [
       "recipe[regularroutes::srvr2]"
