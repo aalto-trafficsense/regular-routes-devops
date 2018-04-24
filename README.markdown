@@ -132,11 +132,15 @@ Set up and start the actual regular-routes (TrafficSense) server.
 1. Make sure chef has access to the file:
     * `$ sudo chgrp lerero regularroutes-srvr.json`
     * `$ sudo chmod 0640 regularroutes-srvr.json`
-1. Setup and start the production server (run default recipe in local mode)  
+1. As of April 23rd 2018, PostgreSQL 10 is missing from the Ubuntu default repositories. If that is the case, check [the instructions](https://www.postgresql.org/download/linux/ubuntu/) on how to add the proper repository.
+1. Setup and start the production server (run default recipe in local mode)
     * `$ cd /opt/regularroutes-cookbooks/cookbooks`
-    * `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json`
+    * First time: installation should work, but services don't start if the `waypoints` table is missing. Therefore on first execution:
+        * Run `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json -o regularroutes:srvr1`
+        * Restore (below) or create (above) the waypoints.
+        * Run `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json -o regularroutes:srvr2`
+    * Once the waypoin-table exists, everything runs with `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json`
     * If the script concludes without fatal errors, the server should be up and running.
-    * _Note: The current installation scripts have major issues with Chef v. 13. Please check problems and solutions below._
 1. *IF* waypoint generation was done on another server, restore the information from that database:
     * Transfer `my_waypoints.tar.gz` to the intended TrafficSense server e.g. with scp.
     * Unpack: `gunzip my_waypoints.tar.gz`
@@ -173,6 +177,10 @@ D: Setting up a local development server using Virtualbox and Vagrant
     * if you have a waypoints dump as instructed in section B above, it should be called `my_waypoints.tar`
     * if `my_waypoints.tar` is not found, the script will look for `regularroutes-wpts.json` (format at instructed in section B above) and generate the waypoints. In this case more memory and a bigger disk are needed. `vagrant plugin install vagrant-disksize`, uncomment line `config.disksize.size = '50GB'` and increase memory `vb.memory = "4096"` in Vagrantfile.
     * if neither waypoint file is present, the script will continue, but all regularroutes services will fail to start because of the missing waypoints table.
+1. As of April 23rd 2018, PostgreSQL 10 is not in the Ubuntu default repositories. Therefore - unfortunately - the box first need to be created and the repository added before the chef-recipe can execute.
+    * Create the virtualbox without provisioning: `$ vagrant up --no-provision`
+    * Log into the new server (`$ vagrant ssh`) and add the proper repository [as instructed](https://www.postgresql.org/download/linux/ubuntu/).
+    * `exit` and continue with the next step
 1. Run Vagrant in the devops repository directory  
     * `$ vagrant up`
 1. Log into your new server

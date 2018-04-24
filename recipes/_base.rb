@@ -30,6 +30,7 @@ execute "create extension postgis" do
   sensitive true
 end
 
+# After postgis extension is created, superuser job is done
 execute "revoke regularroutes superuser privileges" do
   user "postgres"
   command %(psql -c "ALTER ROLE regularroutes nosuperuser;")

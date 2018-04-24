@@ -11,7 +11,7 @@ sudo apt-get install -y curl
 echo "********************"
 echo "Installing libraries"
 
-sudo apt-get install -y build-essential python-pip python-dev gfortran libatlas-base-dev libblas-dev liblapack-dev libssl-dev
+sudo apt-get install -y build-essential python3-pip python3-dev python3-venv gfortran libatlas-base-dev libblas-dev liblapack-dev libssl-dev
 
 echo "********************"
 echo "Create user 'lerero'"
@@ -21,7 +21,7 @@ sudo adduser --system --group lerero
 echo "******************************"
 echo "Create regularroutes directory"
 
-sudo mkdir /opt/regularroutes
+sudo mkdir -p /opt/regularroutes
 # chef sets the owner, group and chmod for the directory, when running osm or default scripts.
 
 echo "********************************************************************"

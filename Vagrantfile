@@ -82,15 +82,20 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     timedatectl set-timezone Europe/Helsinki
     sh -c "echo 'LANGUAGE=en_US.UTF-8\nLC_ALL=en_US.UTF-8\nLC_CTYPE=en_US.UTF-8' >> /etc/default/locale"
+    # PostgreSQL 10 is currently not included in the default repos. Add the repo if missing.
+    if [ ! -e /etc/apt/sources.list.d/pgdg.list ]; then
+      echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+      wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+    fi
     apt-get update
     # apt-get install -y curl # ubuntu/xenial64 box already has an up-to-date curl, uncomment if a future box doesn't
-    apt-get install -y build-essential python-pip python-dev gfortran libatlas-base-dev libblas-dev liblapack-dev libssl-dev
+    apt-get install -y build-essential python3-pip python3-dev python3-venv gfortran libatlas-base-dev libblas-dev liblapack-dev libssl-dev
     adduser --system --group lerero
     # Easier to access systemd-logs afterwards
     adduser vagrant systemd-journal
     cd /opt
-    mkdir regularroutes
-    mkdir regularroutes-cookbooks
+    mkdir -p regularroutes
+    mkdir -p regularroutes-cookbooks
     cd regularroutes-cookbooks
     # Note: Thus copy of regularroutes-srvr.json is currently not used, but in non-Vagrant installations and
     #       later manual updates it is expected to be in /opt/regularroutes-cookbooks

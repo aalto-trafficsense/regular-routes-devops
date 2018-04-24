@@ -70,6 +70,25 @@ cookbook_file "#{node['nginx']['dir']}/sites-available/regularroutes.conf" do
   mode "0644"
 end
 
+# 24.4.2018 "nxensite" and "nixdissite" broken, so these don't work:
+# nginx_site "default" do
+#   enable false
+# end
+
+# nginx_site "regularroutes.conf"
+
+bash 'do_python' do
+  user 'root'
+  cwd node['nginx']['dir']
+  code <<-EOH
+    if [[ ! -e sites-available/regularroutes.conf ]]; then
+      ln -s sites-available/regularroutes.conf sites-enabled/
+    fi
+    rm -f sites-available/default
+  EOH
+end
+
+
 service 'nginx' do
   action [ :enable, :start ]
 end
@@ -107,12 +126,12 @@ directory '/opt/regularroutes/virtualenv' do
   action :create
 end
 
-python_virtualenv '/opt/regularroutes/virtualenv' do
-  python '3'
-  pip_version false
-  setuptools_version false
-  wheel_version false
-end
+# python_virtualenv '/opt/regularroutes/virtualenv' do
+#   python '3'
+#   pip_version false
+#   setuptools_version false
+#   wheel_version false
+# end
 
 # Currently disabled, since poise-python crashes due to a faulty rexexp thinking that pip version > 10 are older than v. 6
 # Resurrect, when postgresql_lwrp (or another postgresql-cookbook) learns to use newer poise-python than 1.6.0
@@ -126,11 +145,16 @@ end
 #   virtualenv '/opt/regularroutes/virtualenv'
 # end
 
+# Temporary patch to the above until a postgresql-cookbook understands a poise-python version which understands pip-versions > 10.
 bash 'do_python' do
+  user 'root'
   cwd '/opt/regularroutes/'
   code <<-EOH
-    /opt/regularroutes/virtualenv/bin/pip install setuptools
-    /opt/regularroutes/virtualenv/bin/pip install gunicorn
-    /opt/regularroutes/virtualenv/bin/pip install -r /opt/regularroutes/server/requirements.txt
+    python3 -m venv /opt/regularroutes/virtualenv
+    source /opt/regularroutes/virtualenv/bin/activate
+    pip install --upgrade pip
+    pip install --upgrade setuptools
+    pip install gunicorn
+    pip install -r /opt/regularroutes/server/requirements.txt
   EOH
 end
