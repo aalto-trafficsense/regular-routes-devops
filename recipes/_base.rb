@@ -30,6 +30,12 @@ execute "create extension postgis" do
   sensitive true
 end
 
+execute "set postgresql timezone" do
+  user "postgres"
+  command %(psql -d regularroutes -c "ALTER USER regularroutes SET timezone='Europe/Helsinki' ;")
+  sensitive true
+end
+
 # After postgis extension is created, superuser job is done
 execute "revoke regularroutes superuser privileges" do
   user "postgres"

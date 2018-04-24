@@ -77,7 +77,7 @@ end
 
 # nginx_site "regularroutes.conf"
 
-bash 'do_python' do
+bash 'nginx: enable regularroutes, disable default site' do
   user 'root'
   cwd node['nginx']['dir']
   code <<-EOH
