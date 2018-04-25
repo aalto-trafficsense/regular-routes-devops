@@ -82,9 +82,9 @@ bash 'nginx: enable regularroutes, disable default site' do
   cwd node['nginx']['dir']
   code <<-EOH
     if [[ ! -e sites-available/regularroutes.conf ]]; then
-      ln -s sites-available/regularroutes.conf sites-enabled/
+      ln -s ../sites-available/regularroutes.conf sites-enabled/
     fi
-    rm -f sites-available/default
+    rm -f sites-enabled/default
   EOH
 end
 
