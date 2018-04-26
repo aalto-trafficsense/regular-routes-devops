@@ -7,6 +7,7 @@ Server migration checklist
 1. Make a test dump of the database.
     * `pg_dump -h 127.0.0.1 -U regularroutes -d regularroutes -F t > ~/regularroutes_dump_full.tar`
 1. Set up a python2 regularroutes migration test server using e.g. Vagrant
+    * Will need both memory and disk-space. Consider using the 50G (instead of default 10G) disk and 4096M memory (configured in Vagrantfile, need vagrant-disksize plugin).
     * Clone regular-routes-devops into a new directory: `$ git clone https://github.com/aalto-trafficsense/regular-routes-devops.git`
     * Enter the directory and checkout remote branch `chef12_fix`:
         * `$ cd regular-routes-devops`
@@ -19,10 +20,10 @@ Server migration checklist
         * No need to include any waypoint-dump or configuration files. Starting regularroutes services will fail at the end of the setup, this is ok.
     * `$ vagrant up` in the new `regular-routes-devops` directory.
 1. Restore the dump e.g. like this
-    * Copy `regularroutes_dump_full.tar` into the `regular-routes-devops/setup-files` directory.
+    * Copy `regularroutes_dump_full.tar` into the `regular-routes-devops/setup-files` directory in the host machine.
     * Enter the new vagrant guest machine `vagrant ssh`
     * Restore the backup: `$ pg_restore --clean -h 127.0.0.1 -U regularroutes -d regularroutes /vagrant/setup-files/regularroutes_dump_full.tar`
-    * (A bunch of errors will be shown because user regularroutes does not have privileges to drop and re-create some roles and because restore is trying to drop all the tables which don't exist yet. Currently 191 errors; should be ok.)
+    * (A bunch of errors will be shown because user regularroutes does not have privileges to drop and re-create some roles and because restore is trying to drop all the tables which don't exist yet. Currently 191 errors; should be ok. _However, "No space left on device"-errors are a problem._)
 1. Start the regularroutes services
     * Manually inside the guest `$ sudo systemctl start regularroutes-site` etc.
     * Or by running '$ vagrant reload' from the host
@@ -30,7 +31,7 @@ Server migration checklist
     * E.g. by logging into `localhost:5000` from a browser in the host, checking the database etc.
 1. Upgrade the Vagrant migration test server
     * Two ways to install the new version: With Vagrant (using the host machine) or without vagrant (from inside the guest machine).
-    * Recommended to use the same method that will be used in the actual server installation.
+    * Recommended to test the same method which will be used in the actual server migration.
 1. Checkout a `regular-routes-devops` branch for chef14
     * `$ git checkout --track origin/chef14_upgrade` (note: later to be merged into the master branch)
     * $ rm Berksfile.lock from the regular-routes-devops directory. Otherwise the old and new Chef dependencies will conflict.
@@ -38,19 +39,21 @@ Server migration checklist
     * In `setup-files/regularroutes-srvr.json` edit `"server-branch"` value to point to the new branch (e.g. `chef14_upgrade`) for the server.
 1. Without Vagrant
     * Package new cookbooks in your local environment ('$ berks package' in the devops directory)
-    * In Vagrant guest machine `opt/regularroutes-cookbooks/regularroutes-srvr.json` edit `"server-branch"` value to point to the new branch (e.g. `chef14_upgrade`) for the server.
+    * In Vagrant guest machine `/opt/regularroutes-cookbooks/regularroutes-srvr.json` edit `"server-branch"` value to point to the new branch (e.g. `chef14_upgrade`) for the server.
 1. Consider disk space
     * The pre-migration script or the new installation branch do not delete the old database.
     * If low on disk space, consider dropping some big and non-critical tables, e.g. waypoints, roads, roads_waypoints would need to be re-generated periodically anyway.
-    * Also device_data_filtered, global_statistics, leg_ends, leg_waypoints, modes, places, travelled_distances and trips can be re-generated, although in the absence of old mass_transit_data the recognized trips would not be identical.
+    * Also device_data_filtered, global_statistics, leg_ends, leg_waypoints, modes, places, travelled_distances and trips can be re-generated, although in the absence of old mass_transit_data (or even old timetables) the recognized public transport trips may change.
     * If all old trip recognitions are kept, mass_transit_data is not very critical.
     * Remember to `VACUUM FULL;`
 1. Run the pre-migration script
     * NOTE: The pre-migration script prudently takes another dump from the database. Since we already have one in place, which is perfectly good for testing, consider commenting out the `pg_dump` line during testing to save time and disk space.
     * In Vagrant guest machine: `$ /vagrant/migration/pre-migration.sh`
 1. Stop the old postgres
+    * The old postgresql service re-starts during installation. If it is still configured to the same port (5432) as the new one, there will be a port conflict and the installation will not finish.
     * Check correct version and cluster with `$ pg_lsclusters`
-    * Stop the correct version, e.g. `$ pg_ctlcluster 9.4 main stop`
+    * Either remove the old one completely, e.g. `$ sudo pg_dropcluster 9.4 main --stop`
+    * Or change the port number in `/etc/postgresql/<version>/main/postgresql.conf` to something else so that it doesn't conflict with the new postgresql.
 1. With Vagrant
     * Provision the new version from host machine: `$ vagrant provision`
 1. Without Vagrant
@@ -68,9 +71,12 @@ Server migration checklist
    * Or with `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json -o regularroutes::srvr2`
    * Or `$ vagrant reload` from the host machine
 1. Test that the database restored properly and everything is working
-    * If you need several iterations, remember to '$ rm Berkshelf.lock' when changing between old and new - otherwise there will be dependency conflicts.
+    * If you need several iterations, remember to '$ rm Berkshelf.lock' when changing between old and new - otherwise installation halts with dependency conflicts.
 1. Do it for real
     * Make sure you have a backup somewhere if everything fails.
     * Remember the points about disk space.
     * This time the pg_dump should be extracted after stopping the regularroutes services but before stopping postgres, so letting the pg_dump run in `pre-migration.sh` may make sense.
     * If using the default dump location with `pre-migration.sh`, also `post-migration.sh` can be run for pg_restore.
+1. Check default, clean old postgres
+    * If removed, the old 9.x postgresql may still be jumping up as the default during restarts etc. Check `/etc/postgresql/$VERSION/main/postgresql.conf` to change the default behaviour.
+    * If the old one can be removed, can do it with `$ sudo pg_dropcluster 9.4 main --stop`
