@@ -1,5 +1,5 @@
-regular-routes DevOps repository
-================================
+regularroutes DevOps repository
+===============================
 
 These instructions assume the use of [Chef](https://www.chef.io/) for installation. It is also assumed that you have access to:
 
@@ -7,6 +7,13 @@ These instructions assume the use of [Chef](https://www.chef.io/) for installati
 1. A server, on which you have owner (root) privileges. Temporary servers on e.g. [Digital Ocean](https://www.digitalocean.com/) can be used as fully featured TrafficSense servers for e.g. waypoint generation or client testing.
 
 Setting up a (test) server on [Vagrant](https://www.vagrantup.com/) can be done with one command using the `Vagrantfile` in this directory, please refer to D below.
+
+Migration guidance
+------------------
+
+BEWARE!!! This version defaults to PostgreSQL version 10. If you are migrating from a server running on 9.x, the databases between PostgreSQL major versions are _not compatible_. While there is a data migration scheme, it requires both PostgreSQL versions to be simultaneously installed. As our tables are using PostGIS, also the PostGIS installations are required. _Therefore it is highly recommended to first take a `pg_dump` of your current database, test e.g. on a Vagrant server that `pg_restore` works as expected, and only after that run the actual upgrade on a production server!!!_ Also, if you want to wipe your server clean and have an entirely fresh start, remember to put the dump somewhere safe. You have been warned.
+
+Proposals for migration bash-scripts are in the `migration folder`. Check the comments in the files and consider the suitability of each operation for your environment.
 
 A: Cookbook operations
 ----------------------
@@ -100,6 +107,7 @@ Set up and start the actual regular-routes (TrafficSense) server.
         * Press "Create"
         * Select the generated Web client ID (default name "Web client 1") and download a JSON-version of the _client secret_ by pressing "Download JSON" and saving the file as "client_secrets.json" to `/opt/regularroutes` on your server.
         * _Note: the "Client ID" (looks like "7948743243-hsuefse3hisefssef.apps.googleuser...") is also needed for building a [TrafficSense client](https://github.com/aalto-trafficsense/trafficsense-android) `web_client_id_test` or `web_client_id_production`. If building a corresponding client, copy and save the ID now._
+        * _Beware: Looks like Google Dev console may no longer include `client_secret` into the client_secrets json-file?!?! If this is the case, it is visible on the console and can be copy-pasted there. The entry in the JSON-file looks like `"client_secret":"l3Tter4ndNumb3rG4rbag3"` and is traditionally placed after `"auth_provider_x509_cert_url"` and before `"redirect_uris"`._
      * 2. Browser API key to be used for Google maps access through the server: "API Key"
         * Select "Browser key". The default name will be "Browser key 1"
         * Enter host names `your.server.url/*` (and `http://localhost:5000` for local development) into the "Accept requests from these HTTP referrers" field
@@ -136,10 +144,10 @@ Set up and start the actual regular-routes (TrafficSense) server.
 1. Setup and start the production server (run default recipe in local mode)
     * `$ cd /opt/regularroutes-cookbooks/cookbooks`
     * First time: installation should work, but services don't start if the `waypoints` table is missing. Therefore on first execution:
-        * Run `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json -o regularroutes:srvr1`
+        * Run `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json -o regularroutes::srvr1`
         * Restore (below) or create (above) the waypoints.
-        * Run `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json -o regularroutes:srvr2`
-    * Once the waypoin-table exists, everything runs with `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json`
+        * Run `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json -o regularroutes::srvr2`
+    * Once the waypoint-table exists, everything runs with `$ sudo chef-client --local-mode -j ../regularroutes-srvr.json`
     * If the script concludes without fatal errors, the server should be up and running.
 1. *IF* waypoint generation was done on another server, restore the information from that database:
     * Transfer `my_waypoints.tar.gz` to the intended TrafficSense server e.g. with scp.
@@ -166,36 +174,35 @@ D: Setting up a local development server using Virtualbox and Vagrant
 -------------------------------------------------------------------
 
 1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-    * On OSX & brew: `$ brew cask install virtualbox`
+    * On OSX + brew: `$ brew cask install virtualbox`
 1. Install [Vagrant](https://www.vagrantup.com/downloads.html)
-    * On OSX & brew: `$ brew cask install vagrant`
+    * On OSX + brew: `$ brew cask install vagrant`
 1. Install Vagrant Berkshelf plugin
     * `$ vagrant plugin install vagrant-berkshelf`
 1. Create the following configuration files and place them in directory `setup-files` in the devops repository directory (where Vagrantfile is)
     * `client_secrets.json` as instructed in section C above.
     * `regularroutes-srvr.json` as instructed in section C above.
-    * if you have a waypoints dump as instructed in section B above, it should be called `my_waypoints.tar`
-    * if `my_waypoints.tar` is not found, the script will look for `regularroutes-wpts.json` (format at instructed in section B above) and generate the waypoints. In this case more memory and a bigger disk are needed. `vagrant plugin install vagrant-disksize`, uncomment line `config.disksize.size = '50GB'` and increase memory `vb.memory = "4096"` in Vagrantfile.
-    * if neither waypoint file is present, the script will continue, but all regularroutes services will fail to start because of the missing waypoints table.
-1. As of April 23rd 2018, PostgreSQL 10 is not in the Ubuntu default repositories. Therefore - unfortunately - the box first need to be created and the repository added before the chef-recipe can execute.
-    * Create the virtualbox without provisioning: `$ vagrant up --no-provision`
-    * Log into the new server (`$ vagrant ssh`) and add the proper repository [as instructed](https://www.postgresql.org/download/linux/ubuntu/).
-    * `exit` and continue with the next step
-1. Run Vagrant in the devops repository directory  
+    * if you have a ready-made waypoints dump as instructed in section B above, it should be called `my_waypoints.tar` and placed in `setup-files`
+    * if `my_waypoints.tar` is not found, the script will look for `regularroutes-wpts.json` (format as instructed in section B above) and generate the waypoints.
+    * if creating waypoints, more memory and a bigger disk than the current defaults are needed. `$ vagrant plugin install vagrant-disksize`, in Vagrantfile uncomment line `config.disksize.size = '50GB'` and increase memory to e.g. `vb.memory = "4096"`.
+    * if neither waypoint file is present, the script will continue, but unless the database has been created before, all regularroutes services will fail to start because of the missing waypoints table.
+1. Start Vagrant in the devops repository directory  
     * `$ vagrant up`
 1. Log into your new server
     * `$ vagrant ssh`
-1. Host port 8080 is mapped to guest port 80 in `Vagrantfile`, so opening `localhost:8080` in a browser in the host machine should produce the sign-in page of `regularroutes-site`.
+1. Host port 5000 is mapped to guest port 80 in the current `Vagrantfile`, so opening `localhost:5000` in a browser in the host machine should produce the sign-in page of `regularroutes-site`.
+    *  Same port as the default in the local server dev environment to minimise changes in Google dev console and client_secrets. Needs to be changed, if local dev environment and vagrant server are executed simultaneously in the same computer.
 1. Remember: If everything went well, all services are running and e.g. `mass_transit_data` is being collected every 30 seconds. If this is undesirable, stop the regularroutes-scheduler service.
 
 Note: No need to run Berks or Chef manually, all taken care of by the vagrant-berkshelf plugin and chef_zero provisioner of Vagrant.
 
-Note 2: Vagrant offers server sharing through internet for testing a local copy of the server (not for production!). At least in some installations the share plugin is missing. If that is the case, first install the plugin:
+Note 2: Vagrant offers server sharing through internet for testing a local copy of the server (not for production!).
+
+In some installations the share plugin is missing. If that is the case, first install the plugin:
 
 `$ vagrant plugin install vagrant-share`
 
-Vagrant share plugin requires [ngrok](https://ngrok.com/download). Available also over brew for OS X: `brew cask install ngrok`. After the plugin is installed `vagrant share` will start sharing and print the generated server URL.
-
+Vagrant share plugin requires [ngrok](https://ngrok.com/download) (https only available in paid plans). Available also over brew for OS X: `brew cask install ngrok`. From host machine `$ vagrant share` will start sharing and print the generated server URL. To add your new server to Google services, go to Google developer console, add the address to Credentials / OAuth 2.0 client IDs / Web application (default name "Web client 1") and API keys / HTTP referrers (default name "Browser key 1"). Load a new `client_secrets.json` and place it into the correct directory (beware, looks like nowadays the "client secret" can be missing from the json-file!). Restart nginx.
 
 E: Importing Open Street map data from crossings-repository
 -----------------------------------------------------------

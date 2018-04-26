@@ -22,11 +22,6 @@ then
   # NOTE: Test restoration of the dump before starting this operation!
   pg_dump -h 127.0.0.1 -U regularroutes -d regularroutes -F t > ~/regularroutes_dump_full.tar
 
-  echo "Stop postgresql service"
-  sudo systemctl stop postgresql
-  echo "Request shutdown of the postgresql server"
-  echo "Note: May fail if pg_ctl is not on the $PATH. Default path is /usr/lib/postgresql/<version>/bin/pg_ctl"
-  pg_ctl stop -m immediate
   echo "Note: This script is not deleting the old postgresql database."
 
   echo "Clean up some directories to ensure a fresh start for the new installation."
