@@ -20,7 +20,6 @@ then
 
   echo "Dump the database to a file"
   # NOTE: Test restoration of the dump before starting this operation!
-  pg_dump -h 127.0.0.1 -U regularroutes -d regularroutes > ~/regularroutes_dump_full.tar
   pg_dump -h 127.0.0.1 -U regularroutes -d regularroutes -F t > ~/regularroutes_dump_full.tar
 
   echo "Stop postgresql service"
