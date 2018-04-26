@@ -23,8 +23,11 @@ then
   pg_dump -h 127.0.0.1 -U regularroutes -d regularroutes -F t > ~/regularroutes_dump_full.tar
 
   echo "Stop postgresql service"
-  echo "Note: This script is not deleting the old postgresql database."
   sudo systemctl stop postgresql
+  echo "Request shutdown of the postgresql server"
+  echo "Note: May fail if pg_ctl is not on the $PATH. Default path is /usr/lib/postgresql/<version>/bin/pg_ctl"
+  pg_ctl stop -m immediate
+  echo "Note: This script is not deleting the old postgresql database."
 
   echo "Clean up some directories to ensure a fresh start for the new installation."
 
@@ -33,8 +36,8 @@ then
   # All python libraries have upgraded => better to start a fresh virtualenv.
   # Renaming the old one in case there would be big problems with the
   # installation.
-  sudo cp /opt/regularroutes/virtualenv /opt/regularroutes/virtualenv.old
-  sudo rm -rf /opt/regularroutes/virtualenv
+  sudo rm -rf /opt/regularroutes/virtualenv.old
+  sudo mv /opt/regularroutes/virtualenv /opt/regularroutes/virtualenv.old
 
   # Note: If the old 'cookbooks' and 'nodes' are still in /opt/regularroutes-cookbooks,
   # they could also be cleaned up at this point. However, for a quick migration it
