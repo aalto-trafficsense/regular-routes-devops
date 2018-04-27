@@ -132,7 +132,7 @@ Set up and start the actual regular-routes (TrafficSense) server.
               "email_to" : "<the email address where mail from the above address is sent>",
               "reverse_geocoding_uri_template" : "<url to pelias instance>",
               "reverse_geocoding_queries_per_second" : "<integer limit>",
-              "server_branch": "chef12_fix <compatible with this devops-branch>"
+              "server_branch": "chef14_upgrade <compatible with this devops-branch>"
            },  
            "run_list": ["recipe[regularroutes]"]  
        }
