@@ -244,17 +244,3 @@ Need to copy (scp) files between two machines because there is no direct ssh con
 
 **Solution:**
 Do the scp from the receiving site.
-
-**Problem:**
-Chef installation script fails.
-
-**Solutions:**
-There are a multitude of issues at the moment:
-* The current installation scripts have major issues with Chef v. 13. Downgrade to Chef v. 12 can be done with:
-    * `$ curl -L -O https://packages.chef.io/files/stable/chefdk/1.5.0/ubuntu/16.04/chefdk_1.5.0-1_amd64.deb`
-    * `$ sudo dpkg -i chefdk_1.5.0-1_amd64.deb`
-* Also the following issues and fixes have been observed:
-    * `pip`fails with `Error executing action `run` on resource 'execute[install-pip]'`. Fix by updating `pip` with `$ sudo easy_install --upgrade pip`.
-    * `psycopg2` installation fails due to the existence of postgresql 10, even though it is not used: `creating pip-egg-info/psycopg2.egg-info` ... `Error: could not determine PostgreSQL version from '10.0'`. The problem has been fixed in `psycopg2`v. 2.7.x (and will not be backported), but the current requirements ask for v. 2.6. Fix by removing the version from `psycopg2` in `/opt/regularroutes/server/requirements.txt`. At the time of writing this installs 2.7.3, which appears to be working fine.
-    * The old `pyOenSSL` also causes problems during installation. Current requirement is v. 0.14; can be bumped up to v. 16.2.0.
-    * `nginx` server may also complain about problems during reload: `Error executing action `reload` on resource 'service[nginx]'`. Root cause not clear; manual restart using `$ /etc/init.d/nginx restart` runs without problems.
