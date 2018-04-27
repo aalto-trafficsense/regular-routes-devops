@@ -13,7 +13,7 @@ Migration guidance
 
 BEWARE!!! This version defaults to PostgreSQL version 10. If you are migrating from a server running on 9.x, the databases between PostgreSQL major versions are _not compatible_. While there is a data migration scheme, it requires both PostgreSQL versions to be simultaneously installed. As our tables are using PostGIS, also the PostGIS installations are required. _Therefore it is highly recommended to first take a `pg_dump` of your current database, test e.g. on a Vagrant server that `pg_restore` works as expected, and only after that run the actual upgrade on a production server!!!_ Also, if you want to wipe your server clean and have an entirely fresh start, remember to put the dump somewhere safe. You have been warned.
 
-Proposals for migration bash-scripts are in the `migration folder`. Check the comments in the files and consider the suitability of each operation for your environment.
+Proposals for migration bash-scripts are in the [migration folder](https://github.com/aalto-trafficsense/regular-routes-devops/tree/chef14_upgrade/migration). Check the comments in the files and consider the suitability of each operation for your environment.
 
 A: Cookbook operations
 ----------------------
