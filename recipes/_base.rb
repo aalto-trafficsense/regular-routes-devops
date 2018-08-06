@@ -20,7 +20,7 @@ postgresql_database 'regularroutes' do
 end
 
 apt_package 'postgis' do
-  version '2.4.4+dfsg-1.pgdg16.04+1'
+  version '2.4.4+dfsg-4.pgdg16.04+1'
   action :install
 end
 
