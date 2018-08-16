@@ -13,7 +13,7 @@ Migration guidance
 
 BEWARE!!! This version defaults to PostgreSQL version 10. If you are migrating from a server running on 9.x, the databases between PostgreSQL major versions are _not compatible_. While there is a data migration scheme, it requires both PostgreSQL versions to be simultaneously installed. As our tables are using PostGIS, also the PostGIS installations are required. _Therefore it is highly recommended to first take a `pg_dump` of your current database, test e.g. on a Vagrant server that `pg_restore` works as expected, and only after that run the actual upgrade on a production server!!!_ Also, if you want to wipe your server clean and have an entirely fresh start, remember to put the dump somewhere safe. You have been warned.
 
-Proposals for migration bash-scripts are in the [migration folder](https://github.com/aalto-trafficsense/regular-routes-devops/tree/chef14_upgrade/migration). Check the ReadMe, the comments in the `pre-migration` and `post-migration` scripts and consider the suitability of each operation for your environment.
+Proposals for migration bash-scripts are in the [migration folder](https://github.com/aalto-trafficsense/regular-routes-devops/tree/master/migration). Check the ReadMe, the comments in the `pre-migration` and `post-migration` scripts and consider the suitability of each operation for your environment.
 
 A: Cookbook operations
 ----------------------
@@ -35,7 +35,7 @@ On your local machine:
     * `$ cd regular-routes-devops`  
     * `$ berks package`  
        * --> creates a file named something like `cookbooks-1432555542.tar.gz`
-       * _Alternative: `berks vendor <path>`creates the files directly to <path>. One good path is `..` But BEWARE, this may cleanup your whole directory structure._
+       * _Alternative: `berks vendor <path>` creates the files directly to <path>. One good path is `..` But BEWARE, this may cleanup your whole directory structure._
 1. Copy the newly generated cookbook package from your local workstation to the target server  
     * `$ scp cookbooks-1432555542.tar.gz user@host:.`
 
@@ -79,7 +79,6 @@ If you have a set of waypoints from your target area, you may skip to step C.
 1. Generate waypoints (run osm recipe in local mode)  
     * `$ cd /opt/regularroutes-cookbooks/cookbooks`
     * `$ sudo chef-client --local-mode -j ../regularroutes-wpts.json`
-    * _Note: The current installation scripts have major issues with Chef v. 13. Check problems and solutions below._
 1. *IF* waypoint generation was done on another server than the intended production server, package and save the resulting waypoints table:
     * `$ pg_dump -h 127.0.0.1 -U regularroutes -d regularroutes -F t -t waypoints -t roads -t roads_waypoints > my_waypoints.tar`
     * Pack: `gzip my_waypoints.tar`
@@ -132,7 +131,7 @@ Set up and start the actual regular-routes (TrafficSense) server.
               "email_to" : "<the email address where mail from the above address is sent>",
               "reverse_geocoding_uri_template" : "<url to pelias instance>",
               "reverse_geocoding_queries_per_second" : "<integer limit>",
-              "server_branch": "chef14_upgrade <compatible with this devops-branch>"
+              "server_branch": "master <compatible with this devops-branch, for old PSQL 9.x installations use chef12_fix>"
            },  
            "run_list": ["recipe[regularroutes]"]  
        }
@@ -163,7 +162,7 @@ Set up and start the actual regular-routes (TrafficSense) server.
        * Add to file `/etc/environment` the following lines: `LC_ALL=en_US.UTF-8` and `LANGUAGE=en_US.UTF-8`
 
 If needed, individual services can be stopped, started and re-started with
-* `$ sudo restart regularroutes-api` (upstart) or `$ sudo systemctl restart regularroutes-api` (systemd)
+* `$ sudo restart regularroutes-api` (upstart) or `$ sudo systemctl restart regularroutes-api` (systemd, new installations)
 * `restart` can be replaced with `stop`, `start` etc.
 * `regularroutes-api` can be replaced with `regularroutes-site`, `regularroutes-dev` or `regularroutes-scheduler`.
 * The functions of the different components are described in the [regular-routes-server readme](https://github.com/aalto-trafficsense/regular-routes-server/blob/master/README.md).
@@ -192,7 +191,7 @@ D: Setting up a local development server using Virtualbox and Vagrant
     * `$ vagrant ssh`
 1. Host port 5000 is mapped to guest port 80 in the current `Vagrantfile`, so opening `localhost:5000` in a browser in the host machine should produce the sign-in page of `regularroutes-site`.
     *  Same port as the default in the local server dev environment to minimise changes in Google dev console and client_secrets. Needs to be changed, if local dev environment and vagrant server are executed simultaneously in the same computer.
-1. Remember: If everything went well, all services are running and e.g. `mass_transit_data` is being collected every 30 seconds. If this is undesirable, stop the regularroutes-scheduler service.
+1. Remember: If everything went well, all services are running and especially `mass_transit_data` will be retrieving content very fast. If this is undesirable, stop the regularroutes-scheduler service.
 
 Note: No need to run Berks or Chef manually, all taken care of by the vagrant-berkshelf plugin and chef_zero provisioner of Vagrant.
 
